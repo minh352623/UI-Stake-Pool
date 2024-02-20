@@ -578,42 +578,42 @@ const NetSwap: FC<NetSwap> = ({ onSwapSent }) => {
       "DkuNXi6GNDBLQo5piaQJZEF6dNxLahpbXRCAg3j6DLYn"
     );
     const authority = wallet.publicKey;
-    // const [stakePoolKey] = anchor.web3.PublicKey.findProgramAddressSync(
-    //   [
-    //     new anchor.BN(nonce).toArrayLike(Buffer, "le", 1),
-    //     mintToBeStaked.toBuffer(),
-    //     authority.toBuffer(),
-    //     Buffer.from("stakePool", "utf-8"),
-    //   ],
-    //   program.programId
-    // );
-    // console.log("🚀 ~ inittialPool ~ stakePoolKey:", stakePoolKey.toString())
-    // const [stakeMintKey] = anchor.web3.PublicKey.findProgramAddressSync(
-    //   [stakePoolKey.toBuffer(), Buffer.from("stakeMint", "utf-8")],
-    //   program.programId
-    // );
-    // const [vaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
-    //   [stakePoolKey.toBuffer(), Buffer.from("vault", "utf-8")],
-    //   program.programId
-    // );
+    const [stakePoolKey] = anchor.web3.PublicKey.findProgramAddressSync(
+      [
+        new anchor.BN(nonce).toArrayLike(Buffer, "le", 1),
+        mintToBeStaked.toBuffer(),
+        authority.toBuffer(),
+        Buffer.from("stakePool", "utf-8"),
+      ],
+      program.programId
+    );
+    console.log("🚀 ~ inittialPool ~ stakePoolKey:", stakePoolKey.toString())
+    const [stakeMintKey] = anchor.web3.PublicKey.findProgramAddressSync(
+      [stakePoolKey.toBuffer(), Buffer.from("stakeMint", "utf-8")],
+      program.programId
+    );
+    const [vaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
+      [stakePoolKey.toBuffer(), Buffer.from("vault", "utf-8")],
+      program.programId
+    );
 
-    // const minDuration = new anchor.BN(0);
-    // const maxDuration = new anchor.BN(31536000); // 1 year in seconds
-    // const maxWeight = new anchor.BN(4 * parseInt(SCALE_FACTOR_BASE.toString()));
-    // await program.methods
-    //   .initializeStakePool(nonce, maxWeight, minDuration, maxDuration)
-    //   .accounts({
-    //     payer: wallet.publicKey,
-    //     authority: authority,
-    //     stakePool: stakePoolKey,
-    //     stakeMint: stakeMintKey,
-    //     mint: mintToBeStaked,
-    //     vault: vaultKey,
-    //     tokenProgram: SPL_TOKEN_PROGRAM_ID,
-    //     rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-    //     systemProgram: anchor.web3.SystemProgram.programId,
-    //   })
-    //   .rpc();
+    const minDuration = new anchor.BN(0);
+    const maxDuration = new anchor.BN(31536000); // 1 year in seconds
+    const maxWeight = new anchor.BN(4 * parseInt(SCALE_FACTOR_BASE.toString()));
+    await program.methods
+      .initializeStakePool(nonce, maxWeight, minDuration, maxDuration)
+      .accounts({
+        payer: wallet.publicKey,
+        authority: authority,
+        stakePool: stakePoolKey,
+        stakeMint: stakeMintKey,
+        mint: mintToBeStaked,
+        vault: vaultKey,
+        tokenProgram: SPL_TOKEN_PROGRAM_ID,
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
       setTimeout(async ()=>{
         const stakePoolKey = new  anchor.web3.PublicKey("D6n38j1Vjv5HMdkME1xHYvFMMKZFgJMjZWbMWumAUvkp")
         const [stakePool ] = await Promise.all([
@@ -685,6 +685,8 @@ const NetSwap: FC<NetSwap> = ({ onSwapSent }) => {
       const TEST_MINT_DECIMALS = 9;
       
       const rewardMint1 = new anchor.web3.PublicKey("7znV6ugwiUDqP7jiBUk1gp3dKFTUztcKMQ5dwcLMgfwm")
+    const rewardMint2 = new anchor.web3.PublicKey("Dxp4GchCUraGabfdkPd1DJonSSrir3166y6T61rECqTd");
+
       const stakePoolKey =new  anchor.web3.PublicKey("D6n38j1Vjv5HMdkME1xHYvFMMKZFgJMjZWbMWumAUvkp")
       const [vaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
         [stakePoolKey.toBuffer(), Buffer.from("vault", "utf-8")],
@@ -757,6 +759,15 @@ const NetSwap: FC<NetSwap> = ({ onSwapSent }) => {
         ],
         program.programId
       );
+
+      const [rewardVaultKey2] = anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          stakePoolKey.toBuffer(),
+          rewardMint2.toBuffer(),
+          Buffer.from("rewardVault", "utf-8"),
+        ],
+        program.programId
+      );
       console.log("🚀 ~ depositStakingSplToken ~ rewardVaultKey:", rewardVaultKey.toString())
   
       const rewardsTransferAmount = new anchor.BN(1_000_000_000);
@@ -787,6 +798,11 @@ const NetSwap: FC<NetSwap> = ({ onSwapSent }) => {
         .remainingAccounts([
           {
             pubkey: rewardVaultKey,
+            isWritable: false,
+            isSigner: false,
+          },
+          {
+            pubkey: rewardVaultKey2,
             isWritable: false,
             isSigner: false,
           },
