@@ -13,7 +13,7 @@ import styles from "./index.module.css";
 import { swap } from "./swap";
 import { useProgram } from "./useProgram";
 import { TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, createMintToInstruction, createTransferInstruction, getAssociatedTokenAddressSync, getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
-import { splTokenProgram } from "@coral-xyz/spl-token";
+import { SPL_TOKEN_PROGRAM_ID, splTokenProgram } from "@coral-xyz/spl-token";
 import { getNextUnusedStakeReceiptNonce } from "@mithraic-labs/token-staking";
 import { SplTokenStaking } from "./spl_token_staking";
 
@@ -40,7 +40,7 @@ export const SolanaSwapView: FC = ({ }) => {
               <ul className="text-xl">
 
                 <li>
-                  <span className="opacity-40">kien6034</span>
+                  <span className="opacity-40">minh352623</span>
                 </li>
               </ul>
             </div>
@@ -541,7 +541,6 @@ const NetSwap: FC<NetSwap> = ({ onSwapSent }) => {
     if (!program) return;
     const provider = new anchor.AnchorProvider(connection, wallet,{ commitment: "confirmed" });
 
-    const tokenProgram = splTokenProgram({ programId: TOKEN_PROGRAM_ID, provider:provider as any });
     const pr0_pub = new anchor.web3.PublicKey("3s44iXti5YBBxA5kP8h7L8LCEeVTh3Wd6LAF9r3Vv8tT")
     const stakePoolKey =new  anchor.web3.PublicKey("GtEzn2dvh2JKk6f92nStA5xa1fQKEnhBo66gPFiPcLdG");
     const rewardMint1 = new anchor.web3.PublicKey("J6boRtivt7qxWpMQHECpbzsZ6sUPLUDEMek8EeGLuCpY");
@@ -560,23 +559,568 @@ const NetSwap: FC<NetSwap> = ({ onSwapSent }) => {
       pr0_pub,
       totalReward1
     );
-    // const createDepositor2Reward1AccountIx =
-    //   createAssociatedTokenAccountInstruction(
-    //     pr0_pub,
-    //     depositerReward1AccountKey2,
-    //     depositor2.publicKey,
-    //     rewardMint1,
-    //     TOKEN_PROGRAM_ID
-    //   );
+
     // transfer 1 reward token to RewardPool at index 0
     await wallet2.sendTransaction(
       new anchor.web3.Transaction()
         .add(transferIx),
         connection
-        // .add(createDepositor2Reward1AccountIx)
     );
   }
 
+//
+  const inittialPool = async () =>{
+    try{
+    if (!program) return;
+      const SCALE_FACTOR_BASE = 1000000000;
+      const nonce = 33;
+    const mintToBeStaked = new anchor.web3.PublicKey(
+      "DkuNXi6GNDBLQo5piaQJZEF6dNxLahpbXRCAg3j6DLYn"
+    );
+    const authority = wallet.publicKey;
+    // const [stakePoolKey] = anchor.web3.PublicKey.findProgramAddressSync(
+    //   [
+    //     new anchor.BN(nonce).toArrayLike(Buffer, "le", 1),
+    //     mintToBeStaked.toBuffer(),
+    //     authority.toBuffer(),
+    //     Buffer.from("stakePool", "utf-8"),
+    //   ],
+    //   program.programId
+    // );
+    // console.log("🚀 ~ inittialPool ~ stakePoolKey:", stakePoolKey.toString())
+    // const [stakeMintKey] = anchor.web3.PublicKey.findProgramAddressSync(
+    //   [stakePoolKey.toBuffer(), Buffer.from("stakeMint", "utf-8")],
+    //   program.programId
+    // );
+    // const [vaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
+    //   [stakePoolKey.toBuffer(), Buffer.from("vault", "utf-8")],
+    //   program.programId
+    // );
+
+    // const minDuration = new anchor.BN(0);
+    // const maxDuration = new anchor.BN(31536000); // 1 year in seconds
+    // const maxWeight = new anchor.BN(4 * parseInt(SCALE_FACTOR_BASE.toString()));
+    // await program.methods
+    //   .initializeStakePool(nonce, maxWeight, minDuration, maxDuration)
+    //   .accounts({
+    //     payer: wallet.publicKey,
+    //     authority: authority,
+    //     stakePool: stakePoolKey,
+    //     stakeMint: stakeMintKey,
+    //     mint: mintToBeStaked,
+    //     vault: vaultKey,
+    //     tokenProgram: SPL_TOKEN_PROGRAM_ID,
+    //     rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+    //     systemProgram: anchor.web3.SystemProgram.programId,
+    //   })
+    //   .rpc();
+      setTimeout(async ()=>{
+        const stakePoolKey = new  anchor.web3.PublicKey("D6n38j1Vjv5HMdkME1xHYvFMMKZFgJMjZWbMWumAUvkp")
+        const [stakePool ] = await Promise.all([
+          program.account.stakePool.fetch(stakePoolKey),
+        ]);
+    
+        console.log("🚀 ~ it ~ stakePool:", stakePool);
+        console.log({
+          authority: (stakePool as any).authority.toString(),
+          mint: (stakePool as any).mint.toString(),
+          stakeMint: (stakePool as any).stakeMint.toString(),
+          vault: (stakePool as any).vault.toString(),
+          creator: (stakePool as any).creator.toString(),
+          totalWeightedStake: Number((stakePool as any).totalWeightedStake),
+          baseWeight: (stakePool as any).baseWeight,
+          maxWeight: (stakePool as any).maxWeight,
+          minDuration: (stakePool as any).minDuration,
+          maxDuration: (stakePool as any).maxDuration,
+        });
+      },2000)
+    }catch(err) {
+    console.log("🚀 ~ inittialPool ~ err:", err)
+    }
+  }
+
+  const addRewardPool = async () =>{
+    try{
+    if (!program) return;
+      const rewardPoolIndex  = 1
+      const _authority = wallet.publicKey
+    const stakePoolKey = new anchor.web3.PublicKey("D6n38j1Vjv5HMdkME1xHYvFMMKZFgJMjZWbMWumAUvkp");
+    const rewardMint = new anchor.web3.PublicKey("7znV6ugwiUDqP7jiBUk1gp3dKFTUztcKMQ5dwcLMgfwm");
+    const rewardMint2 = new anchor.web3.PublicKey("Dxp4GchCUraGabfdkPd1DJonSSrir3166y6T61rECqTd");
+
+    const [rewardVaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
+      [
+        stakePoolKey.toBuffer(),
+        rewardMint2.toBuffer(),
+        Buffer.from("rewardVault", "utf-8"),
+      ],
+      program.programId
+    );
+    console.log("🚀 ~ addRewardPool ~ rewardVaultKey:", rewardVaultKey.toString())
+    return program.methods
+      .addRewardPool(rewardPoolIndex)
+      .accounts({
+        payer: wallet.publicKey,
+        authority: _authority,
+        rewardMint:rewardMint2,
+        stakePool: stakePoolKey,
+        rewardVault: rewardVaultKey,
+        tokenProgram: SPL_TOKEN_PROGRAM_ID,
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+    }catch(err) {
+    console.log("🚀 ~ addRewardPool ~ err:", err)
+    }
+  }
+
+  const depositStakingSplToken2 = async () => {
+    try {
+      if (!program) return;
+      const stakePoolNonce = 77; // TODO unique global nonce generation?
+      const mintToBeStaked = new anchor.web3.PublicKey(
+        "DkuNXi6GNDBLQo5piaQJZEF6dNxLahpbXRCAg3j6DLYn"
+      );
+      const TEST_MINT_DECIMALS = 9;
+      
+      const rewardMint1 = new anchor.web3.PublicKey("7znV6ugwiUDqP7jiBUk1gp3dKFTUztcKMQ5dwcLMgfwm")
+      const stakePoolKey =new  anchor.web3.PublicKey("D6n38j1Vjv5HMdkME1xHYvFMMKZFgJMjZWbMWumAUvkp")
+      const [vaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
+        [stakePoolKey.toBuffer(), Buffer.from("vault", "utf-8")],
+        program.programId
+      );
+      console.log("🚀 ~ depositStakingSplToken ~ vaultKey:", vaultKey.toString())
+      const [stakeMint] = anchor.web3.PublicKey.findProgramAddressSync(
+        [stakePoolKey.toBuffer(), Buffer.from("stakeMint", "utf-8")],
+        program.programId
+      );
+      console.log("🚀 ~ depositStakingSplToken ~ stakeMint:", stakeMint.toString())
+
+      // const stakeMintAccountKey = getAssociatedTokenAddressSync(
+      //   stakeMint,
+      //   wallet.publicKey,
+      //   false,
+      //   TOKEN_PROGRAM_ID
+      // );
+      // await importToken(stakeMint.toString());
+      const stakeMintAccountKey = await getOrCreateAssociatedTokenAccount(
+        connection,
+        wallet,
+        stakeMint,
+        wallet.publicKey,
+        false,
+      );
+
+      console.log("🚀 ~ depositStakingSplToken ~ stakeMintAccountKey:", stakeMintAccountKey.address.toString())
+      // console.log("🚀 ~ depositStakingSplToken ~ stakeMintAccountKey2:", stakeMintAccountKey2.address.toString())
+  
+      const mintToBeStakedAccount = getAssociatedTokenAddressSync(
+        mintToBeStaked,
+        wallet.publicKey,
+        false,
+        TOKEN_PROGRAM_ID
+      );
+      console.log("🚀 ~ depositStakingSplToken ~ mintToBeStakedAccount:", mintToBeStakedAccount.toString())
+
+      const deposit1Amount = new anchor.BN(3_000_000_000);
+      const minDuration = new anchor.BN(31536000/4);
+   
+  
+      // deposit
+  
+      const nextNonce = await getNextUnusedStakeReceiptNonce(
+        program.provider.connection,
+        program.programId,
+        wallet.publicKey,
+        stakePoolKey
+      );
+      // const nextNonce = 0;
+      console.log("🚀 ~ depositStakingSplToken ~ nextNonce:", nextNonce)
+
+      const [stakeReceiptKey] = anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          wallet.publicKey.toBuffer(),
+          stakePoolKey.toBuffer(),
+          new anchor.BN(nextNonce).toArrayLike(Buffer, "le", 4),
+          Buffer.from("stakeDepositReceipt", "utf-8"),
+        ],
+        program.programId
+      );
+
+      console.log("🚀 ~ depositStakingSplToken ~ stakeReceiptKey:", stakeReceiptKey.toString())
+      const [rewardVaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          stakePoolKey.toBuffer(),
+          rewardMint1.toBuffer(),
+          Buffer.from("rewardVault", "utf-8"),
+        ],
+        program.programId
+      );
+      console.log("🚀 ~ depositStakingSplToken ~ rewardVaultKey:", rewardVaultKey.toString())
+  
+      const rewardsTransferAmount = new anchor.BN(1_000_000_000);
+      const rewardsPerEffectiveStake = rewardsTransferAmount.div(deposit1Amount);
+      console.log("🚀 ~ depositStakingSplToken ~ rewardsPerEffectiveStake:", Number(rewardsPerEffectiveStake))
+      const transferIx = createTransferInstruction(
+        getAssociatedTokenAddressSync(rewardMint1,new anchor.web3.PublicKey("3s44iXti5YBBxA5kP8h7L8LCEeVTh3Wd6LAF9r3Vv8tT")),
+        rewardVaultKey,
+        new anchor.web3.PublicKey("3s44iXti5YBBxA5kP8h7L8LCEeVTh3Wd6LAF9r3Vv8tT"),
+        rewardsTransferAmount.toNumber()
+      );
+
+      await program.methods
+        .deposit(nextNonce, deposit1Amount, minDuration)
+        .accounts({
+          payer: wallet.publicKey,
+          owner: wallet.publicKey,
+          from: mintToBeStakedAccount,
+          stakeMint,
+          stakePool: stakePoolKey,
+          vault: vaultKey,
+          destination: stakeMintAccountKey.address,
+          stakeDepositReceipt: stakeReceiptKey,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .remainingAccounts([
+          {
+            pubkey: rewardVaultKey,
+            isWritable: false,
+            isSigner: false,
+          },
+        ])
+        // .preInstructions([transferIx])
+        // .signers([keypair])
+        .rpc({ skipPreflight: true });
+      // const [
+      //   mintToBeStakedAccountAfter,
+      //   vault,
+      //   stakeMintAccount,
+      //   stakeReceipt,
+      //   stakePool,
+      // ] = await Promise.all([
+      //   tokenProgram.account.account.fetch(mintToBeStakedAccount),
+      //   tokenProgram.account.account.fetch(vaultKey),
+      //   tokenProgram.account.account.fetch(stakeMintAccountKey),
+      //   program.account.stakeDepositReceipt.fetch(stakeReceiptKey),
+      //   program.account.stakePool.fetch(stakePoolKey),
+      // ]);
+      // console.log({  mintToBeStakedAccountAfter,
+      //   vault,
+      //   stakeMintAccount,
+      //   stakeReceipt,
+      //   stakePool,});
+      
+    } catch (e) {
+      console.log("🚀 ~ depositStakingSplToken ~ e:", e);
+    }
+  };
+
+  const addReward2 = async ()=>{
+    if (!program) return;
+    const provider = new anchor.AnchorProvider(connection, wallet,{ commitment: "confirmed" });
+
+    const pr0_pub = wallet.publicKey;
+    const stakePoolKey =new  anchor.web3.PublicKey("D6n38j1Vjv5HMdkME1xHYvFMMKZFgJMjZWbMWumAUvkp");
+    const rewardMint1 = new anchor.web3.PublicKey("7znV6ugwiUDqP7jiBUk1gp3dKFTUztcKMQ5dwcLMgfwm");
+    const rewardMint2 = new anchor.web3.PublicKey("Dxp4GchCUraGabfdkPd1DJonSSrir3166y6T61rECqTd");
+
+    const [rewardVaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
+      [
+        stakePoolKey.toBuffer(),
+        rewardMint2.toBuffer(),
+        Buffer.from("rewardVault", "utf-8"),
+      ],
+      program.programId
+    );
+    const totalReward1 = 10_000_000_000;
+    const transferIx = createTransferInstruction(
+      getAssociatedTokenAddressSync(rewardMint2, pr0_pub),
+      rewardVaultKey,
+      pr0_pub,
+      totalReward1
+    );
+
+    // transfer 1 reward token to RewardPool at index 0
+    await wallet2.sendTransaction(
+      new anchor.web3.Transaction()
+        .add(transferIx),
+        connection
+    );
+  }
+
+
+  const withfraw2 = async(receiptNonceNumber:number)=>{
+    try{
+      if (!program) return;
+      const mintToBeStaked = new anchor.web3.PublicKey(
+        "DkuNXi6GNDBLQo5piaQJZEF6dNxLahpbXRCAg3j6DLYn"
+      );
+      const TEST_MINT_DECIMALS = 9;
+      
+      const rewardMint1 = new anchor.web3.PublicKey("7znV6ugwiUDqP7jiBUk1gp3dKFTUztcKMQ5dwcLMgfwm")
+      const rewardMint2 = new anchor.web3.PublicKey("Dxp4GchCUraGabfdkPd1DJonSSrir3166y6T61rECqTd");
+
+      const stakePoolKey =new  anchor.web3.PublicKey("D6n38j1Vjv5HMdkME1xHYvFMMKZFgJMjZWbMWumAUvkp")
+      const [vaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
+        [stakePoolKey.toBuffer(), Buffer.from("vault", "utf-8")],
+        program.programId
+      );
+      console.log("🚀 ~ depositStakingSplToken ~ vaultKey:", vaultKey.toString())
+      const [stakeMint] = anchor.web3.PublicKey.findProgramAddressSync(
+        [stakePoolKey.toBuffer(), Buffer.from("stakeMint", "utf-8")],
+        program.programId
+      );
+      // await importToken("J6boRtivt7qxWpMQHECpbzsZ6sUPLUDEMek8EeGLuCpY")
+      const stakeMintAccountKey = await getOrCreateAssociatedTokenAccount(
+        connection,
+        wallet,
+        stakeMint,
+        wallet.publicKey,
+        false,
+      );
+      const receiptNonce = receiptNonceNumber;
+      console.log("🚀 ~ withfraw ~ receiptNonce:", receiptNonce)
+      const mintToBeStakedAccount = getAssociatedTokenAddressSync(
+        mintToBeStaked,
+        wallet.publicKey,
+        false,
+        TOKEN_PROGRAM_ID
+      );
+      const [stakeReceiptKey] = anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          wallet.publicKey.toBuffer(),
+          stakePoolKey.toBuffer(),
+          new anchor.BN(receiptNonce).toArrayLike(Buffer, "le", 4),
+          Buffer.from("stakeDepositReceipt", "utf-8"),
+        ],
+        program.programId
+      );
+      const [rewardVaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          stakePoolKey.toBuffer(),
+          rewardMint1.toBuffer(),
+          Buffer.from("rewardVault", "utf-8"),
+        ],
+        program.programId
+      );
+
+
+      const depositorReward1AccountKey = getAssociatedTokenAddressSync(
+        rewardMint1,
+        wallet.publicKey
+      );
+
+      const [rewardVaultKey2] = anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          stakePoolKey.toBuffer(),
+          rewardMint2.toBuffer(),
+          Buffer.from("rewardVault", "utf-8"),
+        ],
+        program.programId
+      );
+
+
+      const depositorReward1AccountKey2 = getAssociatedTokenAddressSync(
+        rewardMint2,
+        wallet.publicKey
+      );
+      await program.methods
+      .withdraw()
+      .accounts({
+        claimBase: {
+          owner: wallet.publicKey,
+          stakePool: stakePoolKey,
+          stakeDepositReceipt: stakeReceiptKey,
+          tokenProgram: TOKEN_PROGRAM_ID,
+        },
+        vault: vaultKey,
+        stakeMint,
+        from: stakeMintAccountKey.address,
+        destination: mintToBeStakedAccount,
+      })
+      .remainingAccounts([
+        {
+          pubkey: rewardVaultKey,
+          isWritable: true,
+          isSigner: false,
+        },
+        {
+          pubkey: depositorReward1AccountKey,
+          isWritable: true,
+          isSigner: false,
+        },
+        {
+          pubkey: rewardVaultKey2,
+          isWritable: true,
+          isSigner: false,
+        },
+        {
+          pubkey: depositorReward1AccountKey2,
+          isWritable: true,
+          isSigner: false,
+        },
+      ])
+      .rpc({ skipPreflight: true });
+    }catch (err) {
+    console.log("🚀 ~ withfraw ~ err:", err)
+    }
+  }
+
+  const claimReward2 = async  (receiptNonceNumber:number) => {
+    try{
+      if (!program) return;
+
+      const mintToBeStaked = new anchor.web3.PublicKey(
+        "DkuNXi6GNDBLQo5piaQJZEF6dNxLahpbXRCAg3j6DLYn"
+      );
+      const TEST_MINT_DECIMALS = 9;
+      
+      const rewardMint1 = new anchor.web3.PublicKey("7znV6ugwiUDqP7jiBUk1gp3dKFTUztcKMQ5dwcLMgfwm")
+      const stakePoolKey =new  anchor.web3.PublicKey("D6n38j1Vjv5HMdkME1xHYvFMMKZFgJMjZWbMWumAUvkp")
+      const rewardMint2 = new anchor.web3.PublicKey("Dxp4GchCUraGabfdkPd1DJonSSrir3166y6T61rECqTd");
+
+      const [vaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
+        [stakePoolKey.toBuffer(), Buffer.from("vault", "utf-8")],
+        program.programId
+      );
+      console.log("🚀 ~ depositStakingSplToken ~ vaultKey:", vaultKey.toString())
+      const receiptNonce = receiptNonceNumber;
+
+      const [stakeReceiptKey] = anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          wallet.publicKey.toBuffer(),
+          stakePoolKey.toBuffer(),
+          new anchor.BN(receiptNonce).toArrayLike(Buffer, "le", 4),
+          Buffer.from("stakeDepositReceipt", "utf-8"),
+        ],
+        program.programId
+      );
+    
+      const [rewardVaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          stakePoolKey.toBuffer(),
+          rewardMint1.toBuffer(),
+          Buffer.from("rewardVault", "utf-8"),
+        ],
+        program.programId
+      );
+      const [rewardVaultKey2] = anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          stakePoolKey.toBuffer(),
+          rewardMint2.toBuffer(),
+          Buffer.from("rewardVault", "utf-8"),
+        ],
+        program.programId
+      );
+      const depositorReward1AccountKey = getAssociatedTokenAddressSync(
+        rewardMint1,
+        wallet.publicKey
+      );
+      const depositorReward1AccountKey2 = getAssociatedTokenAddressSync(
+        rewardMint2,
+        wallet.publicKey
+      );
+      console.log("🚀 ~ claimReward ~ depositorReward1AccountKey:", depositorReward1AccountKey)
+
+      await program.methods
+      .claimAll()
+      .accounts({
+        claimBase: {
+          owner: wallet.publicKey,
+          stakePool: stakePoolKey,
+          stakeDepositReceipt: stakeReceiptKey,
+          tokenProgram: TOKEN_PROGRAM_ID
+        },
+      
+      })
+      .remainingAccounts([
+        {
+          pubkey: rewardVaultKey,
+          isWritable: true,
+          isSigner: false,
+        },
+        {
+          pubkey: depositorReward1AccountKey,
+          isWritable: true,
+          isSigner: false,
+        },
+        {
+          pubkey: rewardVaultKey2,
+          isWritable: true,
+          isSigner: false,
+        },
+        {
+          pubkey: depositorReward1AccountKey2,
+          isWritable: true,
+          isSigner: false,
+        },
+      ])
+      .rpc({ skipPreflight: true });
+    }catch(err) {
+    console.log("🚀 ~ claimReward ~ err:", err)
+    }
+  }
+
+  const infoReceipt2 = async (receiptNonce: number) => {
+    if (!program) return;
+    console.log("🚀 ~ infoReceipt2 ~ program:", program)
+
+    const provider = new anchor.AnchorProvider(connection, wallet,{ commitment: "confirmed" });
+
+    const tokenProgram = splTokenProgram({ programId: TOKEN_PROGRAM_ID, provider:provider as any });
+    console.log("🚀 ~ infoReceipt2 ~ tokenProgram:", tokenProgram)
+
+    const stakePoolKey =new  anchor.web3.PublicKey("D6n38j1Vjv5HMdkME1xHYvFMMKZFgJMjZWbMWumAUvkp");
+    const rewardMint1 = new anchor.web3.PublicKey("7znV6ugwiUDqP7jiBUk1gp3dKFTUztcKMQ5dwcLMgfwm")
+    
+  const depositerReward1AccKey = getAssociatedTokenAddressSync(
+    rewardMint1,
+    wallet.publicKey
+  );
+    const [stakeReceiptKey] = anchor.web3.PublicKey.findProgramAddressSync(
+      [
+        wallet.publicKey.toBuffer(),
+        stakePoolKey.toBuffer(),
+        new anchor.BN(receiptNonce).toArrayLike(Buffer, "le", 4),
+        Buffer.from("stakeDepositReceipt", "utf-8"),
+      ],
+      program.programId
+    );
+
+
+    const [depositerReward1Account, stakeReceipt, stakePool] =
+      await Promise.all([
+        tokenProgram.account.account.fetch(depositerReward1AccKey),
+        program.account.stakeDepositReceipt.fetch(stakeReceiptKey),
+        program.account.stakePool.fetch(stakePoolKey),
+      ]);
+
+      console.log("🚀 ~ infoReceipt ~ depositerReward1Account:", depositerReward1Account)
+      console.log("🚀 ~ infoReceipt ~ stakeReceipt:", Number(stakeReceipt.depositAmount)) // amount stake
+      console.log("🚀 ~ infoReceipt ~ effectiveStake:", Number(stakeReceipt.effectiveStake)) // amount after time stake
+
+      console.log("🚀 ~ infoReceipt ~ stakeReceipt time lock:", Number(stakeReceipt.lockupDuration))//time lock
+      console.log("🚀 ~ infoReceipt ~ stakeReceipt: time start lock", Number(stakeReceipt.depositTimestamp))//time start lock
+      console.log("date Withdrawed", new Date((Number(stakeReceipt.lockupDuration) + Number(stakeReceipt.depositTimestamp) )* 1000)); //date claimed
+      
+
+      console.log("🚀 ~ infoReceipt ~ stakeReceipt:", (stakeReceipt))
+
+      console.log("🚀 ~ infoReceipt ~ stakePool:", stakePool);
+      console.log("claim amount");
+      console.log(Number((stakePool as any).rewardPools[receiptNonce].rewardsPerEffectiveStake));
+      
+      (stakePool as any)?.rewardPools.forEach((item:any)=>{
+        console.log("----------------");
+        
+        console.log(Number(item.rewardsPerEffectiveStake));
+        
+      })
+
+  }
   return (
     <div style={{ minWidth: 240 }} className="mb-8 pb-4 border-b border-gray-500 flex ">
 
@@ -591,14 +1135,14 @@ const NetSwap: FC<NetSwap> = ({ onSwapSent }) => {
         } placeholder="Enter the SOL amount" className="mb-4"></input>
         <button
           className="btn btn-primary rounded-full normal-case	w-full"
-          onClick={depositStakingSplToken}
+          onClick={depositStakingSplToken2}
           style={{ minHeight: 0, height: 40 }}
         >
           Deposit
         </button>
         <button
           className="btn btn-primary rounded-full normal-case	w-full"
-          onClick={()=>withfraw(1)}
+          onClick={()=>withfraw2(0)}
           style={{ minHeight: 0, height: 40 }}
         >
           Withdraw and claim reward
@@ -606,14 +1150,14 @@ const NetSwap: FC<NetSwap> = ({ onSwapSent }) => {
 
         <button
           className="btn btn-primary rounded-full normal-case	w-full"
-          onClick={()=>claimReward(0)}
+          onClick={()=>claimReward2(1)}
           style={{ minHeight: 0, height: 40 }}
         >
           Claim Reward
         </button>
         <button
           className="btn btn-primary rounded-full normal-case	w-full"
-          onClick={()=>infoReceipt(1)}
+          onClick={()=>infoReceipt2(0)}
           style={{ minHeight: 0, height: 40 }}
         >
          Get Info Reward
@@ -621,10 +1165,27 @@ const NetSwap: FC<NetSwap> = ({ onSwapSent }) => {
 
         <button
           className="btn btn-primary rounded-full normal-case	w-full"
-          onClick={()=>addReward()}
+          onClick={()=>addReward2()}
           style={{ minHeight: 0, height: 40 }}
         >
          Add Reward
+        </button>
+
+
+        <button
+          className="btn btn-primary rounded-full normal-case	w-full"
+          onClick={()=>inittialPool()}
+          style={{ minHeight: 0, height: 40 }}
+        >
+         init pool stake
+        </button>
+
+        <button
+          className="btn btn-primary rounded-full normal-case	w-full"
+          onClick={()=>addRewardPool()}
+          style={{ minHeight: 0, height: 40 }}
+        >
+         add pool reward
         </button>
       </div>
     </div>
