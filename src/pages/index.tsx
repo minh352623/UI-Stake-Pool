@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { SolanaSwapView } from "views";
+import { SolanaPoolStakeView } from "views";
 
 const Home: NextPage = (props) => {
   return (
@@ -12,7 +12,7 @@ const Home: NextPage = (props) => {
           content="A demo site for Remi"
         />
       </Head>
-      <SolanaSwapView />
+      <SolanaPoolStakeView />
     </div>
   );
 };

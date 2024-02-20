@@ -1,1 +1,1 @@
-export { SolanaSwapView } from "./SolanaSwapView";
+export { SolanaPoolStakeView } from "./SolanaPoolStakeView";
