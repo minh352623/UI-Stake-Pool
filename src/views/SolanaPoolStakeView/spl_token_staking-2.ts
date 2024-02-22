@@ -1,5 +1,5 @@
 export type SplTokenStaking = {
-    "version": "1.3.1",
+    "version": "1.1.2",
     "name": "spl_token_staking",
     "instructions": [
       {
@@ -299,6 +299,80 @@ export type SplTokenStaking = {
         ]
       },
       {
+        "name": "transferToAdmin",
+        "accounts": [
+          {
+            "name": "claimBase",
+            "accounts": [
+              {
+                "name": "owner",
+                "isMut": true,
+                "isSigner": true,
+                "docs": [
+                  "Owner of the StakeDepositReceipt"
+                ]
+              },
+              {
+                "name": "stakePool",
+                "isMut": true,
+                "isSigner": false
+              },
+              {
+                "name": "stakeDepositReceipt",
+                "isMut": true,
+                "isSigner": false,
+                "docs": [
+                  "StakeDepositReceipt of the owner that will be used to claim respective rewards"
+                ]
+              },
+              {
+                "name": "tokenProgram",
+                "isMut": false,
+                "isSigner": false
+              }
+            ]
+          },
+          {
+            "name": "vault",
+            "isMut": true,
+            "isSigner": false,
+            "docs": [
+              "Vault of the StakePool token will be transferred from"
+            ]
+          },
+          {
+            "name": "stakeMint",
+            "isMut": true,
+            "isSigner": false,
+            "docs": [
+              "stake_mint of StakePool that will be burned"
+            ]
+          },
+          {
+            "name": "from",
+            "isMut": true,
+            "isSigner": false,
+            "docs": [
+              "Token Account holding weighted stake representation token to burn"
+            ]
+          },
+          {
+            "name": "destination",
+            "isMut": true,
+            "isSigner": false,
+            "docs": [
+              "Token account to transfer the previously staked token to"
+            ]
+          }
+        ],
+        "args": [
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      },
+      {
         "name": "claimAll",
         "docs": [
           "Claim unclaimed rewards from all RewardPools for a specific StakeDepositReceipt.",
@@ -432,70 +506,47 @@ export type SplTokenStaking = {
         "args": []
       },
       {
-        "name": "transferToAdmin",
+        "name": "transferTokens",
         "accounts": [
           {
-            "name": "claimBase",
-            "accounts": [
-              {
-                "name": "owner",
-                "isMut": true,
-                "isSigner": true,
-                "docs": [
-                  "Owner of the StakeDepositReceipt"
-                ]
-              },
-              {
-                "name": "stakePool",
-                "isMut": true,
-                "isSigner": false
-              },
-              {
-                "name": "stakeDepositReceipt",
-                "isMut": true,
-                "isSigner": false,
-                "docs": [
-                  "StakeDepositReceipt of the owner that will be used to claim respective rewards"
-                ]
-              },
-              {
-                "name": "tokenProgram",
-                "isMut": false,
-                "isSigner": false
-              }
-            ]
+            "name": "sender",
+            "isMut": true,
+            "isSigner": true
           },
           {
-            "name": "vault",
-            "isMut": true,
-            "isSigner": false,
-            "docs": [
-              "Vault of the StakePool token will be transferred from"
-            ]
+            "name": "recipient",
+            "isMut": false,
+            "isSigner": false
           },
           {
-            "name": "stakeMint",
+            "name": "mintAccount",
             "isMut": true,
-            "isSigner": false,
-            "docs": [
-              "stake_mint of StakePool that will be burned"
-            ]
+            "isSigner": false
           },
           {
-            "name": "from",
+            "name": "senderTokenAccount",
             "isMut": true,
-            "isSigner": false,
-            "docs": [
-              "Token Account holding weighted stake representation token to burn"
-            ]
+            "isSigner": false
           },
           {
-            "name": "destination",
+            "name": "recipientTokenAccount",
             "isMut": true,
-            "isSigner": false,
-            "docs": [
-              "Token account to transfer the previously staked token to"
-            ]
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "associatedTokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
           }
         ],
         "args": [
@@ -819,7 +870,7 @@ export type SplTokenStaking = {
   };
   
   export const IDL: SplTokenStaking = {
-    "version": "1.3.1",
+    "version": "1.1.2",
     "name": "spl_token_staking",
     "instructions": [
       {
@@ -1119,6 +1170,80 @@ export type SplTokenStaking = {
         ]
       },
       {
+        "name": "transferToAdmin",
+        "accounts": [
+          {
+            "name": "claimBase",
+            "accounts": [
+              {
+                "name": "owner",
+                "isMut": true,
+                "isSigner": true,
+                "docs": [
+                  "Owner of the StakeDepositReceipt"
+                ]
+              },
+              {
+                "name": "stakePool",
+                "isMut": true,
+                "isSigner": false
+              },
+              {
+                "name": "stakeDepositReceipt",
+                "isMut": true,
+                "isSigner": false,
+                "docs": [
+                  "StakeDepositReceipt of the owner that will be used to claim respective rewards"
+                ]
+              },
+              {
+                "name": "tokenProgram",
+                "isMut": false,
+                "isSigner": false
+              }
+            ]
+          },
+          {
+            "name": "vault",
+            "isMut": true,
+            "isSigner": false,
+            "docs": [
+              "Vault of the StakePool token will be transferred from"
+            ]
+          },
+          {
+            "name": "stakeMint",
+            "isMut": true,
+            "isSigner": false,
+            "docs": [
+              "stake_mint of StakePool that will be burned"
+            ]
+          },
+          {
+            "name": "from",
+            "isMut": true,
+            "isSigner": false,
+            "docs": [
+              "Token Account holding weighted stake representation token to burn"
+            ]
+          },
+          {
+            "name": "destination",
+            "isMut": true,
+            "isSigner": false,
+            "docs": [
+              "Token account to transfer the previously staked token to"
+            ]
+          }
+        ],
+        "args": [
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      },
+      {
         "name": "claimAll",
         "docs": [
           "Claim unclaimed rewards from all RewardPools for a specific StakeDepositReceipt.",
@@ -1252,70 +1377,47 @@ export type SplTokenStaking = {
         "args": []
       },
       {
-        "name": "transferToAdmin",
+        "name": "transferTokens",
         "accounts": [
           {
-            "name": "claimBase",
-            "accounts": [
-              {
-                "name": "owner",
-                "isMut": true,
-                "isSigner": true,
-                "docs": [
-                  "Owner of the StakeDepositReceipt"
-                ]
-              },
-              {
-                "name": "stakePool",
-                "isMut": true,
-                "isSigner": false
-              },
-              {
-                "name": "stakeDepositReceipt",
-                "isMut": true,
-                "isSigner": false,
-                "docs": [
-                  "StakeDepositReceipt of the owner that will be used to claim respective rewards"
-                ]
-              },
-              {
-                "name": "tokenProgram",
-                "isMut": false,
-                "isSigner": false
-              }
-            ]
+            "name": "sender",
+            "isMut": true,
+            "isSigner": true
           },
           {
-            "name": "vault",
-            "isMut": true,
-            "isSigner": false,
-            "docs": [
-              "Vault of the StakePool token will be transferred from"
-            ]
+            "name": "recipient",
+            "isMut": false,
+            "isSigner": false
           },
           {
-            "name": "stakeMint",
+            "name": "mintAccount",
             "isMut": true,
-            "isSigner": false,
-            "docs": [
-              "stake_mint of StakePool that will be burned"
-            ]
+            "isSigner": false
           },
           {
-            "name": "from",
+            "name": "senderTokenAccount",
             "isMut": true,
-            "isSigner": false,
-            "docs": [
-              "Token Account holding weighted stake representation token to burn"
-            ]
+            "isSigner": false
           },
           {
-            "name": "destination",
+            "name": "recipientTokenAccount",
             "isMut": true,
-            "isSigner": false,
-            "docs": [
-              "Token account to transfer the previously staked token to"
-            ]
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "associatedTokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
           }
         ],
         "args": [

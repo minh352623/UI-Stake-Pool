@@ -12,7 +12,7 @@ import { SolanaLogo } from "components";
 import styles from "./index.module.css";
 import { swap } from "./swap";
 import { useProgram } from "./useProgram";
-import { TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, createMintToInstruction, createTransferInstruction, getAssociatedTokenAddressSync, getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
+import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, createMintToInstruction, createTransferInstruction, getAssociatedTokenAddressSync, getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 import { SPL_TOKEN_PROGRAM_ID, splTokenProgram } from "@coral-xyz/spl-token";
 import { getNextUnusedStakeReceiptNonce } from "@mithraic-labs/token-staking";
 import { SplTokenStaking } from "./spl_token_staking";
@@ -251,18 +251,34 @@ const NetSwap: FC<NetSwap> = ({ }) => {
 
   const [poolStakeSelect, setPoolStakeSelect] = useState<IInfoPoolStake>({
     "authority": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
-    "mint": "75khJVhdfu9t4teJkRL3RaE1KZaWXsFNS5nfZRsNwGvQ",
-    "stakeMint": "AsHmasFsw5p3YyvDXDzMs4P4PixDzLjy8z4FVayrEWcb",
-    "vault": "9yNafSMYeRtFMjmRFmAd7p388ujA2CxSZhu1e4ocGVLr",
+    "mint": "GHANstGTbisEQ3wYo5soc6pXtr3yUCkNckP9nFkiZScH",
+    "stakeMint": "CxpkQL5Y96H5opHp1mzHinSuX7GCe3FMAYVSDqJGzJ9d",
+    "vault": "rXdRpQyGCxBuje1FXrDe1PUzzhRn3sXVAyVBABC4bWF",
     "creator": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
     "totalWeightedStake": "0",
     "base_weight": "1000000000",
-    "max_weight": "4000000000",
+    "max_weight": "3000000000",
     "min_duration": "1000",
     "max_duration": "31536000",
-    "pool_key":"5hkcBdcYoRNs6ZgwHj3S6YJmFKqWQwmh2Ukneuk56nhN",
+    "pool_key":"B3ULFQeTDB3AgzzB8ytdR4ZaAv2y3wG3JyyCTtEuGYhh",
     "pool_rewards":[]
 })
+
+// {
+//   "authority": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
+//   "mint": "GHANstGTbisEQ3wYo5soc6pXtr3yUCkNckP9nFkiZScH",
+//   "stakeMint": "CxpkQL5Y96H5opHp1mzHinSuX7GCe3FMAYVSDqJGzJ9d",
+//   "vault": "rXdRpQyGCxBuje1FXrDe1PUzzhRn3sXVAyVBABC4bWF",
+//   "creator": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
+//   "totalWeightedStake": "0",
+//   "base_weight": "1000000000",
+//   "max_weight": "3000000000",
+//   "min_duration": "1000",
+//   "max_duration": "31536000",
+//   "pool_key":"B3ULFQeTDB3AgzzB8ytdR4ZaAv2y3wG3JyyCTtEuGYhh",
+//   "pool_rewards":[]
+// }
+
 
   function isNumeric(value: any) {
     return /^[0-9]{0,9}(\.[0-9]{1,2})?$/.test(value);
@@ -515,6 +531,9 @@ const NetSwap: FC<NetSwap> = ({ }) => {
   const depositStakingSplToken = async () => {
     try {
       if (!program) return;
+
+
+
       console.log("🚀 ~ depositStakingSplToken ~ poolStakeSelect:", poolStakeSelect)
 
       const mintToBeStaked = new anchor.web3.PublicKey(
@@ -649,16 +668,60 @@ const NetSwap: FC<NetSwap> = ({ }) => {
     }
   };
 
+  const transferSplToken = async ()=>{
+    if (!program) return;
+
+    const amount = new anchor.BN(50);
+      const mintToBeStaked = new anchor.web3.PublicKey(
+             poolStakeSelect.mint
+           );
+           const stakepool_key = new anchor.web3.PublicKey(poolStakeSelect.pool_key);
+     
+           const [vaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
+             [stakepool_key.toBuffer(), Buffer.from("vault", "utf-8")],
+             program.programId
+           );
+           console.log("🚀 ~ transferAmountMintToAdmin ~ vaultKey:", vaultKey.toString())
+     
+     
+             const frommintToBeStakedAccount = getAssociatedTokenAddressSync(
+             mintToBeStaked,
+             wallet.publicKey,
+             false,
+             TOKEN_PROGRAM_ID
+           );
+           const tomintToBeStakedAccount = getAssociatedTokenAddressSync(
+             mintToBeStaked,
+             new anchor.web3.PublicKey("DzguMtFxZkKGhpmrteBLhM6kDBadctp2nyjNY5nRhHfY"),
+             false,
+             TOKEN_PROGRAM_ID
+           );
+         const transactionSignature = await program.methods
+           .transferTokens(amount)
+           .accounts({
+             sender: wallet.publicKey,
+             recipient: new anchor.web3.PublicKey("DzguMtFxZkKGhpmrteBLhM6kDBadctp2nyjNY5nRhHfY"),
+             mintAccount: mintToBeStaked,
+             senderTokenAccount: frommintToBeStakedAccount,
+             recipientTokenAccount: tomintToBeStakedAccount,
+             tokenProgram: TOKEN_PROGRAM_ID,
+             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+             systemProgram: anchor.web3.SystemProgram.programId,
+           })
+           .rpc();
+     
+         console.log("Success!");
+         console.log(`   Transaction Signature: ${transactionSignature}`);
+  }
+
   const transferAmountMintToAdmin = async () => {
     try {
       if (!program) return;
-      console.log("🚀 ~ transferAmountMintToAdmin ~ program:", program)
 
       const mintToBeStaked = new anchor.web3.PublicKey(
         poolStakeSelect.mint
       );
       const stakepool_key = new anchor.web3.PublicKey(poolStakeSelect.pool_key);
-      console.log("🚀 ~ transferAmountMintToAdmin ~ stakepool_key:", stakepool_key)
       const [vaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
         [stakepool_key.toBuffer(), Buffer.from("vault", "utf-8")],
         program.programId
@@ -676,7 +739,9 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         wallet.publicKey,
         false,
       );
-      const receiptNonce = 1;
+      console.log("🚀 ~ transferAmountMintToAdmin ~ stakeMintAccountKey:", stakeMintAccountKey.address)
+
+      const receiptNonce = 0;
       console.log("🚀 ~ withfraw ~ receiptNonce:", receiptNonce)
       const mintToBeStakedAccount = getAssociatedTokenAddressSync(
         mintToBeStaked,
@@ -693,7 +758,6 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         ],
         program.programId
       );
-      console.log("🚀 ~ transferAmountMintToAdmin ~ stakeReceiptKey:", stakeReceiptKey.toString())
       
       const remainingAccounts = poolStakeSelect.pool_rewards.map(reward => {
 
@@ -725,7 +789,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         ]
       })
       await program.methods
-        .transferToAdmin(new anchor.BN(5_00_000_000))
+        .transferToAdmin(new anchor.BN(5000000000))
         .accounts({
           claimBase: {
             owner: wallet.publicKey,
@@ -740,10 +804,8 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         })
         .remainingAccounts(remainingAccounts.flat())
         .rpc({ skipPreflight: true });
-
-
-    } catch (e) {
-      console.log("🚀 ~ depositStakingSplToken ~ e:", e);
+    } catch (err) {
+      console.log("🚀 ~ withfraw ~ err:", err)
     }
   };
 

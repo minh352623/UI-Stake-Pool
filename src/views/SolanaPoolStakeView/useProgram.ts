@@ -42,13 +42,13 @@ export const useProgram = ({ connection, wallet }: ProgramProps) => {
     // const programId = new anchor.web3.PublicKey(
     //   "9TemRuwmBFsgkss4HiqvpKugVHpRR7vVc7aufiPGn9qA"
     // );
-    const programId = new anchor.web3.PublicKey(
-      "6JN3LnpcgnFAZ7TjGkY5FUA2L8nNez5AigtsAuvs5Wwz"
-    );
-
     // const programId = new anchor.web3.PublicKey(
-    //   "7XzqcW4VPEzCzrhbgoDEbXtSTNVQ87Vh6m1byK2zjWYD"
+    //   "3zCun8eH7bsbqE35xCoyUAX78fp3FHsiUpaBLa8BfGes"
     // );
+
+    const programId = new anchor.web3.PublicKey(
+      "uAGY5qgH4d9k5yrt57euSHdGfiNSp85r3PKdeL8R1Fh"
+    );
 
     const program = new anchor.Program(IDL as any, programId, provider);
     setProgram(program);

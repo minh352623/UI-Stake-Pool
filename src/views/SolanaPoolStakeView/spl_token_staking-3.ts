@@ -1,5 +1,5 @@
 export type SplTokenStaking = {
-  "version": "1.4.1",
+  "version": "1.3.1",
   "name": "spl_token_staking",
   "instructions": [
     {
@@ -433,9 +433,6 @@ export type SplTokenStaking = {
     },
     {
       "name": "transferToAdmin",
-      "docs": [
-        ""
-      ],
       "accounts": [
         {
           "name": "claimBase",
@@ -499,6 +496,57 @@ export type SplTokenStaking = {
           "docs": [
             "Token account to transfer the previously staked token to"
           ]
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "transferTokens",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "recipient",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "senderTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "recipientTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -822,7 +870,7 @@ export type SplTokenStaking = {
 };
 
 export const IDL: SplTokenStaking = {
-  "version": "1.4.1",
+  "version": "1.3.1",
   "name": "spl_token_staking",
   "instructions": [
     {
@@ -1256,9 +1304,6 @@ export const IDL: SplTokenStaking = {
     },
     {
       "name": "transferToAdmin",
-      "docs": [
-        ""
-      ],
       "accounts": [
         {
           "name": "claimBase",
@@ -1322,6 +1367,57 @@ export const IDL: SplTokenStaking = {
           "docs": [
             "Token account to transfer the previously staked token to"
           ]
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "transferTokens",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "recipient",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mintAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "senderTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "recipientTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
