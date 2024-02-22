@@ -1,4 +1,10 @@
 {
+  "../../node_modules/@metaplex-foundation/js/dist/esm/plugins/irysStorage/IrysStorageDriver.mjs -> @irys/sdk": {
+    "id": "../../node_modules/@metaplex-foundation/js/dist/esm/plugins/irysStorage/IrysStorageDriver.mjs -> @irys/sdk",
+    "files": [
+      "static/chunks/node_modules_irys_sdk_build_esm_web_index_js.js"
+    ]
+  },
   "../contexts/ClientWalletProvider.tsx -> @solana/wallet-adapter-react-ui/styles.css": {
     "id": "../contexts/ClientWalletProvider.tsx -> @solana/wallet-adapter-react-ui/styles.css",
     "files": [

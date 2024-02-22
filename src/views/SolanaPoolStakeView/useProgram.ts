@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import * as anchor from "@project-serum/anchor";
+import { IDL } from "./spl_token_staking-2";
 
-import idl from "./solana-dapp-swap.json";
-import { IDL } from "./spl_token_staking";
+// import { IDL } from "./spl_token_staking";
 
 
 export interface Wallet {
@@ -39,9 +39,16 @@ export const useProgram = ({ connection, wallet }: ProgramProps) => {
     // const programID = new PublicKey(idl.metadata.address);
     // const program = new anchor.Program(idl as any, programID, provider);
     // setProgram(program);
+    // const programId = new anchor.web3.PublicKey(
+    //   "9TemRuwmBFsgkss4HiqvpKugVHpRR7vVc7aufiPGn9qA"
+    // );
     const programId = new anchor.web3.PublicKey(
-      "9TemRuwmBFsgkss4HiqvpKugVHpRR7vVc7aufiPGn9qA"
+      "6JN3LnpcgnFAZ7TjGkY5FUA2L8nNez5AigtsAuvs5Wwz"
     );
+
+    // const programId = new anchor.web3.PublicKey(
+    //   "7XzqcW4VPEzCzrhbgoDEbXtSTNVQ87Vh6m1byK2zjWYD"
+    // );
 
     const program = new anchor.Program(IDL as any, programId, provider);
     setProgram(program);
