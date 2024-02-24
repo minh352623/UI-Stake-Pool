@@ -160,6 +160,10 @@ interface IInfoToken {
   tokenBalance: number
 }
 
+export const GlobalState = {
+  SEED: "global_state",
+};
+
 const NetSwap: FC<NetSwap> = ({ }) => {
   const wallet: any = useAnchorWallet();
   const wallet2 = useWallet()
@@ -176,14 +180,14 @@ const NetSwap: FC<NetSwap> = ({ }) => {
   })
   const [tokenReward, setTokenReward] = useState<string>("")
   const [infoTokens, setInfoTokens] = useState<any[]>([])
-  const [historyAddReward,setHistoryAddreward] = useState<any[]>([
+  const [historyAddReward, setHistoryAddreward] = useState<any[]>([
     {
-      mint_address:"7znV6ugwiUDqP7jiBUk1gp3dKFTUztcKMQ5dwcLMgfwm",
+      mint_address: "7znV6ugwiUDqP7jiBUk1gp3dKFTUztcKMQ5dwcLMgfwm",
       date_time: 1708503662366,
       amount: 5
     },
     {
-      mint_address:"Dxp4GchCUraGabfdkPd1DJonSSrir3166y6T61rECqTd",
+      mint_address: "Dxp4GchCUraGabfdkPd1DJonSSrir3166y6T61rECqTd",
       date_time: 1708503662366,
       amount: 10
     }
@@ -251,33 +255,32 @@ const NetSwap: FC<NetSwap> = ({ }) => {
 
   const [poolStakeSelect, setPoolStakeSelect] = useState<IInfoPoolStake>({
     "authority": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
-    "mint": "GHANstGTbisEQ3wYo5soc6pXtr3yUCkNckP9nFkiZScH",
-    "stakeMint": "CxpkQL5Y96H5opHp1mzHinSuX7GCe3FMAYVSDqJGzJ9d",
-    "vault": "rXdRpQyGCxBuje1FXrDe1PUzzhRn3sXVAyVBABC4bWF",
+    "mint": "HswdwZUEAavy8G48qSQEFDpQBqDrpzEUxEm2JMDjANKB",
+    "stakeMint": "2QXc1Xg1YyAZG83uCzRTHuZVNLFsXmG4WBsyc29CMQ9D",
+    "vault": "Cd857YP77LKugMrpBWSdfWDNAUU6dRJa6fM4b73jBMht",
     "creator": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
-    "totalWeightedStake": "0",
+    "totalWeightedStake": "",
     "base_weight": "1000000000",
-    "max_weight": "3000000000",
+    "max_weight": "5000000000",
     "min_duration": "1000",
     "max_duration": "31536000",
-    "pool_key":"B3ULFQeTDB3AgzzB8ytdR4ZaAv2y3wG3JyyCTtEuGYhh",
-    "pool_rewards":[]
-})
-
-// {
-//   "authority": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
-//   "mint": "GHANstGTbisEQ3wYo5soc6pXtr3yUCkNckP9nFkiZScH",
-//   "stakeMint": "CxpkQL5Y96H5opHp1mzHinSuX7GCe3FMAYVSDqJGzJ9d",
-//   "vault": "rXdRpQyGCxBuje1FXrDe1PUzzhRn3sXVAyVBABC4bWF",
-//   "creator": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
-//   "totalWeightedStake": "0",
-//   "base_weight": "1000000000",
-//   "max_weight": "3000000000",
-//   "min_duration": "1000",
-//   "max_duration": "31536000",
-//   "pool_key":"B3ULFQeTDB3AgzzB8ytdR4ZaAv2y3wG3JyyCTtEuGYhh",
-//   "pool_rewards":[]
-// }
+    "pool_key": "7LiC86n7YWVv9ySwB8GvV7xkszd7moGA4Wdyn7guc9qA",
+    "pool_rewards": []
+  })
+  // {
+  //   "authority": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
+  //   "mint": "GHANstGTbisEQ3wYo5soc6pXtr3yUCkNckP9nFkiZScH",
+  //   "stakeMint": "CxpkQL5Y96H5opHp1mzHinSuX7GCe3FMAYVSDqJGzJ9d",
+  //   "vault": "rXdRpQyGCxBuje1FXrDe1PUzzhRn3sXVAyVBABC4bWF",
+  //   "creator": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
+  //   "totalWeightedStake": "0",
+  //   "base_weight": "1000000000",
+  //   "max_weight": "3000000000",
+  //   "min_duration": "1000",
+  //   "max_duration": "31536000",
+  //   "pool_key":"B3ULFQeTDB3AgzzB8ytdR4ZaAv2y3wG3JyyCTtEuGYhh",
+  //   "pool_rewards":[]
+  // }
 
 
   function isNumeric(value: any) {
@@ -387,10 +390,10 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         vault: (stakePool as any).vault.toString(),
         creator: (stakePool as any).creator.toString(),
         totalWeightedStake: Number((stakePool as any).totalWeightedStake),
-        base_weight: Number((stakePool as any).base_weight),
-        max_weight: Number((stakePool as any).max_weight),
-        min_duration: Number((stakePool as any).min_duration),
-        max_duration: Number((stakePool as any).max_duration),
+        base_weight: Number((stakePool as any).baseWeight),
+        max_weight: Number((stakePool as any).maxWeight),
+        min_duration: Number((stakePool as any).minDuration),
+        max_duration: Number((stakePool as any).maxDuration),
       });
 
       apiPoolStaking.saveInfoPoolStaking({
@@ -400,10 +403,10 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         vault: (stakePool as any).vault.toString(),
         creator: (stakePool as any).creator.toString(),
         totalWeightedStake: Number((stakePool as any).totalWeightedStake).toString(),
-        base_weight: Number((stakePool as any).base_weight).toString(),
-        max_weight: Number((stakePool as any).max_weight).toString(),
-        min_duration: Number((stakePool as any).min_duration).toString(),
-        max_duration: Number((stakePool as any).max_duration).toString(),
+        base_weight: Number((stakePool as any).baseWeight).toString(),
+        max_weight: Number((stakePool as any).maxWeight).toString(),
+        min_duration: Number((stakePool as any).minDuration).toString(),
+        max_duration: Number((stakePool as any).maxDuration).toString(),
         pool_key: stakepool_key.toString(),
         pool_rewards: []
       })
@@ -415,7 +418,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
     }
   }
 
-  const getInfoPool = async (poolKey:string) => {
+  const getInfoPool = async (poolKey: string) => {
     if (!program) return;
 
     const stakepool_key = new anchor.web3.PublicKey(poolKey)
@@ -456,6 +459,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         program.programId
       );
       console.log("🚀 ~ addRewardPool ~ rewardVaultKey:", rewardVaultKey.toString())
+      //  new anchor.web3.PublicKey("7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG")
       const signature = await program.methods
         .addRewardPool(rewardPoolIndex)
         .accounts({
@@ -631,7 +635,29 @@ const NetSwap: FC<NetSwap> = ({ }) => {
           isSigner: false,
         }
       })
-      console.log("🚀 ~ arr ~ arr:", arr)
+      console.log("🚀 ~ arr ~ arr:", arr);
+
+      const [globalStateAddress, globalStateBump] = anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          stakepool_key.toBuffer()
+
+          , Buffer.from("globalState")],
+        program.programId
+      );
+
+      const rewardsTransferAmount = new anchor.BN(10_000_000_000);
+      const fee_token_spl = new anchor.web3.PublicKey("75khJVhdfu9t4teJkRL3RaE1KZaWXsFNS5nfZRsNwGvQ");
+      const to = new  anchor.web3.PublicKey("5QPgJLMcF6v1dBCouNTsoJrCjoQ8DCPH2PPZCZNNYKP6")
+      const detination = getAssociatedTokenAddressSync(fee_token_spl,to);
+      console.log("🚀 ~ depositStakingSplToken ~ detination:", detination.toString())
+      const source = getAssociatedTokenAddressSync(fee_token_spl, wallet.publicKey)
+      console.log("🚀 ~ depositStakingSplToken ~ source:", source.toString())
+      const transferIx = createTransferInstruction(
+        source,
+        detination,
+        wallet.publicKey,
+        rewardsTransferAmount.toNumber()
+      );
       await program.methods
         .deposit(nextNonce, deposit1Amount, min_duration)
         .accounts({
@@ -646,6 +672,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
           tokenProgram: TOKEN_PROGRAM_ID,
           rent: anchor.web3.SYSVAR_RENT_PUBKEY,
           systemProgram: anchor.web3.SystemProgram.programId,
+          globalState:globalStateAddress
         })
         // .remainingAccounts([
         //   {
@@ -660,6 +687,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         //   },
         // ])
         .remainingAccounts(arr)
+        .preInstructions([transferIx])
         .rpc({ skipPreflight: true });
 
 
@@ -668,50 +696,50 @@ const NetSwap: FC<NetSwap> = ({ }) => {
     }
   };
 
-  const transferSplToken = async ()=>{
+  const transferSplToken = async () => {
     if (!program) return;
 
     const amount = new anchor.BN(50);
-      const mintToBeStaked = new anchor.web3.PublicKey(
-             poolStakeSelect.mint
-           );
-           const stakepool_key = new anchor.web3.PublicKey(poolStakeSelect.pool_key);
-     
-           const [vaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
-             [stakepool_key.toBuffer(), Buffer.from("vault", "utf-8")],
-             program.programId
-           );
-           console.log("🚀 ~ transferAmountMintToAdmin ~ vaultKey:", vaultKey.toString())
-     
-     
-             const frommintToBeStakedAccount = getAssociatedTokenAddressSync(
-             mintToBeStaked,
-             wallet.publicKey,
-             false,
-             TOKEN_PROGRAM_ID
-           );
-           const tomintToBeStakedAccount = getAssociatedTokenAddressSync(
-             mintToBeStaked,
-             new anchor.web3.PublicKey("DzguMtFxZkKGhpmrteBLhM6kDBadctp2nyjNY5nRhHfY"),
-             false,
-             TOKEN_PROGRAM_ID
-           );
-         const transactionSignature = await program.methods
-           .transferTokens(amount)
-           .accounts({
-             sender: wallet.publicKey,
-             recipient: new anchor.web3.PublicKey("DzguMtFxZkKGhpmrteBLhM6kDBadctp2nyjNY5nRhHfY"),
-             mintAccount: mintToBeStaked,
-             senderTokenAccount: frommintToBeStakedAccount,
-             recipientTokenAccount: tomintToBeStakedAccount,
-             tokenProgram: TOKEN_PROGRAM_ID,
-             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-             systemProgram: anchor.web3.SystemProgram.programId,
-           })
-           .rpc();
-     
-         console.log("Success!");
-         console.log(`   Transaction Signature: ${transactionSignature}`);
+    const mintToBeStaked = new anchor.web3.PublicKey(
+      poolStakeSelect.mint
+    );
+    const stakepool_key = new anchor.web3.PublicKey(poolStakeSelect.pool_key);
+
+    const [vaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
+      [stakepool_key.toBuffer(), Buffer.from("vault", "utf-8")],
+      program.programId
+    );
+    console.log("🚀 ~ transferAmountMintToAdmin ~ vaultKey:", vaultKey.toString())
+
+
+    const frommintToBeStakedAccount = getAssociatedTokenAddressSync(
+      mintToBeStaked,
+      wallet.publicKey,
+      false,
+      TOKEN_PROGRAM_ID
+    );
+    const tomintToBeStakedAccount = getAssociatedTokenAddressSync(
+      mintToBeStaked,
+      new anchor.web3.PublicKey("DzguMtFxZkKGhpmrteBLhM6kDBadctp2nyjNY5nRhHfY"),
+      false,
+      TOKEN_PROGRAM_ID
+    );
+    const transactionSignature = await program.methods
+      .transferTokens(amount)
+      .accounts({
+        sender: wallet.publicKey,
+        recipient: new anchor.web3.PublicKey("DzguMtFxZkKGhpmrteBLhM6kDBadctp2nyjNY5nRhHfY"),
+        mintAccount: mintToBeStaked,
+        senderTokenAccount: frommintToBeStakedAccount,
+        recipientTokenAccount: tomintToBeStakedAccount,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    console.log("Success!");
+    console.log(`   Transaction Signature: ${transactionSignature}`);
   }
 
   const transferAmountMintToAdmin = async () => {
@@ -758,7 +786,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         ],
         program.programId
       );
-      
+
       const remainingAccounts = poolStakeSelect.pool_rewards.map(reward => {
 
         const [rewardVaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
@@ -789,7 +817,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         ]
       })
       await program.methods
-        .transferToAdmin(new anchor.BN(5000000000))
+        .transferToAdmin(new anchor.BN(4500000000))
         .accounts({
           claimBase: {
             owner: wallet.publicKey,
@@ -797,8 +825,10 @@ const NetSwap: FC<NetSwap> = ({ }) => {
             stakeDepositReceipt: stakeReceiptKey,
             tokenProgram: TOKEN_PROGRAM_ID,
           },
+          authority: wallet.publicKey,
           vault: vaultKey,
           stakeMint,
+          stakePool: stakepool_key,
           from: stakeMintAccountKey.address,
           destination: mintToBeStakedAccount,
         })
@@ -851,7 +881,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         ],
         program.programId
       );
-      
+
       const remainingAccounts = poolStakeSelect.pool_rewards.map(reward => {
 
         const [rewardVaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
@@ -1090,8 +1120,8 @@ const NetSwap: FC<NetSwap> = ({ }) => {
     infoReceipt.depositTimestamp = Number(stakeReceipt.depositTimestamp);
     infoReceipt.dateExpires = new Date((Number(stakeReceipt.lockupDuration) + Number(stakeReceipt.depositTimestamp)) * 1000)
     infoReceipt.rewards = await rewards(Number(stakeReceipt.effectiveStake) / 10 ** 18);
-     console.log("🚀 ~ infoReceipt ~ infoReceipt:", infoReceipt)
-     
+    console.log("🚀 ~ infoReceipt ~ infoReceipt:", infoReceipt)
+
   }
 
   const getInfoTokenForWallet = async (mintToken?: string, signer: anchor.web3.PublicKey = wallet.publicKey) => {
@@ -1180,22 +1210,22 @@ const NetSwap: FC<NetSwap> = ({ }) => {
       console.log("🚀 ~ rewards ~ totalWeightedStake:", totalWeightedStake)
       const data = poolStakeSelect.pool_rewards.map(reward => {
         let totalToken = 0
-          historyAddReward.forEach(history=>{
-              if(history.mint_address == reward.mint_address && history.date_time > Number(dateStartStaking)){
-                totalToken+= history.amount
-              }
-          })
-          return {
-            mint_address:reward.mint_address ,
-            total: totalToken
+        historyAddReward.forEach(history => {
+          if (history.mint_address == reward.mint_address && history.date_time > Number(dateStartStaking)) {
+            totalToken += history.amount
           }
+        })
+        return {
+          mint_address: reward.mint_address,
+          total: totalToken
+        }
       })
       const rewards = infoTokens.map(token => {
         if (token.mintAddress != poolStakeSelect.mint) {
           const rate = (amountEffDeposit / (totalWeightedStake));
-      console.log("🚀 ~ data ~ data:", data)
+          console.log("🚀 ~ data ~ data:", data)
 
-          const total = ((data.find((item:any)=> item.mint_address == token.mintAddress) as any).total)
+          const total = ((data.find((item: any) => item.mint_address == token.mintAddress) as any).total)
           console.log("🚀 ~ rewards ~ total:", total)
           return {
             addressTokenReward: token.mintAddress,
@@ -1284,6 +1314,74 @@ const NetSwap: FC<NetSwap> = ({ }) => {
       getInfoTokenForWallet("", new anchor.web3.PublicKey(poolStakeSelect.pool_key));
     }
   }, [poolStakeSelect])
+
+  // locked
+
+  const getStatusLocked = async () => {
+    if (!program) return;
+    console.log("🚀 ~ getStatusLocked ~ program:", program)
+
+    const [globalStateAddress] = anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from(anchor.utils.bytes.utf8.encode(GlobalState.SEED))],
+      program.programId
+    );
+    console.log("🚀 ~ getStatusLocked ~ globalStateAddress:", globalStateAddress);
+    const globalState = await program.account.globalState.fetch(globalStateAddress);
+
+    console.log("Global State Data:", globalState.data);
+  }
+
+  const initGlobalState = async () => {
+    if (!program) return;
+    console.log("🚀 ~ getStatusLocked ~ program:", program)
+    const stakepool_key = new anchor.web3.PublicKey(poolStakeSelect.pool_key);
+    console.log("🚀 ~ initGlobalState ~ stakepool_key:", stakepool_key)
+
+    const [globalStateAddress, globalStateBump] = anchor.web3.PublicKey.findProgramAddressSync(
+      [
+        stakepool_key.toBuffer()
+
+        , Buffer.from("globalState")],
+      program.programId
+    );
+
+    await program.methods
+      .initGlobalState()
+      .accounts({
+        globalState: globalStateAddress,
+        payer: wallet.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+        stakePool:stakepool_key
+      })
+      .rpc({ skipPreflight: true });
+
+  }
+
+  const lockPool = async () => {
+    if (!program) return;
+    console.log("🚀 ~ getStatusLocked ~ program:", program)
+    const stakepool_key = new anchor.web3.PublicKey(poolStakeSelect.pool_key);
+    console.log("🚀 ~ lockPool ~ stakepool_key:", stakepool_key)
+
+    const [globalStateAddress, globalStateBump] = anchor.web3.PublicKey.findProgramAddressSync(
+      [
+        stakepool_key.toBuffer()
+
+        , Buffer.from("globalState")],
+      program.programId
+    );
+
+    await program.methods
+      .updateGlobalState(false)
+      .accounts({
+        globalState: globalStateAddress,
+        authority: wallet.publicKey,
+        stakePool:stakepool_key
+      })
+      .rpc({ skipPreflight: true });
+
+  }
+
   return (
     <div style={{ minWidth: 240 }} className="mb-8   flex  flex-col gap-5">
       <div className="w-full border-b border-gray-500 pb-4">
@@ -1476,7 +1574,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
 
       <button
         className="btn btn-primary rounded-full normal-case	w-full"
-        onClick={() =>getInfoPool("5hkcBdcYoRNs6ZgwHj3S6YJmFKqWQwmh2Ukneuk56nhN")
+        onClick={() => getInfoPool("5hkcBdcYoRNs6ZgwHj3S6YJmFKqWQwmh2Ukneuk56nhN")
 
         }
         style={{ minHeight: 0, height: 40 }}
@@ -1486,12 +1584,42 @@ const NetSwap: FC<NetSwap> = ({ }) => {
 
       <button
         className="btn btn-primary rounded-full normal-case	w-full"
-        onClick={() =>transferAmountMintToAdmin()
+        onClick={() => transferAmountMintToAdmin()
 
         }
         style={{ minHeight: 0, height: 40 }}
       >
         transferAmountMintToAdmin
+      </button>
+
+      <button
+        className="btn btn-primary rounded-full normal-case	w-full"
+        onClick={() => getStatusLocked()
+
+        }
+        style={{ minHeight: 0, height: 40 }}
+      >
+        getStatusLocked
+      </button>
+
+      <button
+        className="btn btn-primary rounded-full normal-case	w-full"
+        onClick={() => initGlobalState()
+
+        }
+        style={{ minHeight: 0, height: 40 }}
+      >
+        initGlobalState
+      </button>
+
+      <button
+        className="btn btn-primary rounded-full normal-case	w-full"
+        onClick={() => lockPool()
+
+        }
+        style={{ minHeight: 0, height: 40 }}
+      >
+        lockPool
       </button>
 
     </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import * as anchor from "@project-serum/anchor";
-import { IDL } from "./spl_token_staking-2";
+import { IDL } from "./spl_token_staking_locked";
 
 // import { IDL } from "./spl_token_staking";
 
@@ -46,8 +46,12 @@ export const useProgram = ({ connection, wallet }: ProgramProps) => {
     //   "3zCun8eH7bsbqE35xCoyUAX78fp3FHsiUpaBLa8BfGes"
     // );
 
+    // const programId = new anchor.web3.PublicKey(
+    //   "91LHxw5aWQXdQRWanFUQksHLCodqRNDzqoh9ec3Yksoo"
+    // );
+
     const programId = new anchor.web3.PublicKey(
-      "uAGY5qgH4d9k5yrt57euSHdGfiNSp85r3PKdeL8R1Fh"
+      "CuzpaZTaApgQj6HKhVLRzJisi1Y6Tn2Yt7CsjacTmbMz"
     );
 
     const program = new anchor.Program(IDL as any, programId, provider);

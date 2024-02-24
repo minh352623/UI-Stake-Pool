@@ -281,6 +281,11 @@ export type SplTokenStaking = {
             "name": "systemProgram",
             "isMut": false,
             "isSigner": false
+          },
+          {
+            "name": "globalState",
+            "isMut": false,
+            "isSigner": false
           }
         ],
         "args": [
@@ -568,9 +573,77 @@ export type SplTokenStaking = {
             "type": "u64"
           }
         ]
+      },
+      {
+        "name": "initGlobalState",
+        "accounts": [
+          {
+            "name": "globalState",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "stakePool",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "updateGlobalState",
+        "accounts": [
+          {
+            "name": "globalState",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "authority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "stakePool",
+            "isMut": true,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "state",
+            "type": "bool"
+          }
+        ]
       }
     ],
     "accounts": [
+      {
+        "name": "globalState",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "locked",
+              "type": "bool"
+            },
+            {
+              "name": "data",
+              "type": "u64"
+            }
+          ]
+        }
+      },
       {
         "name": "stakePool",
         "type": {
@@ -878,6 +951,16 @@ export type SplTokenStaking = {
         "code": 6012,
         "name": "DurationTooShort",
         "msg": "Duration too short"
+      },
+      {
+        "code": 6013,
+        "name": "Unauthorized",
+        "msg": "The caller is not authorized to perform this action."
+      },
+      {
+        "code": 6014,
+        "name": "ResourceLocked",
+        "msg": "The resource is currently locked."
       }
     ]
   };
@@ -1165,6 +1248,11 @@ export type SplTokenStaking = {
             "name": "systemProgram",
             "isMut": false,
             "isSigner": false
+          },
+          {
+            "name": "globalState",
+            "isMut": false,
+            "isSigner": false
           }
         ],
         "args": [
@@ -1452,9 +1540,77 @@ export type SplTokenStaking = {
             "type": "u64"
           }
         ]
+      },
+      {
+        "name": "initGlobalState",
+        "accounts": [
+          {
+            "name": "globalState",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "payer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "stakePool",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "updateGlobalState",
+        "accounts": [
+          {
+            "name": "globalState",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "authority",
+            "isMut": false,
+            "isSigner": true
+          },
+          {
+            "name": "stakePool",
+            "isMut": true,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "state",
+            "type": "bool"
+          }
+        ]
       }
     ],
     "accounts": [
+      {
+        "name": "globalState",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "locked",
+              "type": "bool"
+            },
+            {
+              "name": "data",
+              "type": "u64"
+            }
+          ]
+        }
+      },
       {
         "name": "stakePool",
         "type": {
@@ -1762,6 +1918,16 @@ export type SplTokenStaking = {
         "code": 6012,
         "name": "DurationTooShort",
         "msg": "Duration too short"
+      },
+      {
+        "code": 6013,
+        "name": "Unauthorized",
+        "msg": "The caller is not authorized to perform this action."
+      },
+      {
+        "code": 6014,
+        "name": "ResourceLocked",
+        "msg": "The resource is currently locked."
       }
     ]
   };
