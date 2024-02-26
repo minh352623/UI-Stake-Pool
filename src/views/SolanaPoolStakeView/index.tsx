@@ -22,7 +22,6 @@ import { IInfoPoolStake } from "api/pool-staking/Interface";
 const endpoint = "https://explorer-api.devnet.solana.com";
 
 const connection = new anchor.web3.Connection(endpoint);
-
 // const listPoolStake = [
 //   {
 //     "authority": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
@@ -881,6 +880,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         ],
         program.programId
       );
+      console.log("🚀 ~ withfraw ~ stakeReceiptKey  withdraw:", stakeReceiptKey.toString())
 
       const remainingAccounts = poolStakeSelect.pool_rewards.map(reward => {
 
@@ -1382,6 +1382,20 @@ const NetSwap: FC<NetSwap> = ({ }) => {
 
   }
 
+  const fetchAllReceipt = async ()=>{
+    if (!program) return;
+    console.log("🚀 ~ fetchAllReceipt ~ program:", program)
+
+    const allReceipts = await program.account.stakeDepositReceipt.all();
+    console.log("🚀 ~ fetchAllReceipt ~ allReceipts:", allReceipts)
+    allReceipts.forEach(item=>{
+      console.log({
+        publicKey: item.publicKey.toString()
+      });
+      
+    })
+  }
+
   return (
     <div style={{ minWidth: 240 }} className="mb-8   flex  flex-col gap-5">
       <div className="w-full border-b border-gray-500 pb-4">
@@ -1621,7 +1635,16 @@ const NetSwap: FC<NetSwap> = ({ }) => {
       >
         lockPool
       </button>
+      
+      <button
+        className="btn btn-primary rounded-full normal-case	w-full"
+        onClick={() => fetchAllReceipt()
 
+        }
+        style={{ minHeight: 0, height: 40 }}
+      >
+        fetchAllReceipt
+      </button>
     </div>
   );
 };
