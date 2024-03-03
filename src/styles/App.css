@@ -14,7 +14,7 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
-input{
+input,select{
   outline: none;
     display: block;
     background: rgba(0, 0, 0, 0.1);

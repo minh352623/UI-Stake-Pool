@@ -12,13 +12,15 @@ import { SolanaLogo } from "components";
 import styles from "./index.module.css";
 import { swap } from "./swap";
 import { useProgram } from "./useProgram";
-import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, createMintToInstruction, createTransferInstruction, getAssociatedTokenAddressSync, getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
+import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, createMintToInstruction, createTransferInstruction, getAssociatedTokenAddressSync, getMint, getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 import { SPL_TOKEN_PROGRAM_ID, splTokenProgram } from "@coral-xyz/spl-token";
 import { getNextUnusedStakeReceiptNonce } from "@mithraic-labs/token-staking";
 import { SplTokenStaking } from "./spl_token_staking";
 import { apiPoolStaking } from "api/pool-staking";
 import { IInfoPoolStake } from "api/pool-staking/Interface";
-
+import { useRouter } from "next/router";
+import { Client, Token, UtlConfig } from '@solflare-wallet/utl-sdk';
+import Navbar from "components/Navbar";
 const endpoint = "https://explorer-api.devnet.solana.com";
 
 const connection = new anchor.web3.Connection(endpoint);
@@ -72,29 +74,39 @@ const connection = new anchor.web3.Connection(endpoint);
 
 // ]
 
+const rewards = [{
+  mint_address: "E4vrHiRWK6JDVjrwAz5UHApKN5tSBQuLe6YeESBihG91"
+}, {
+  mint_address: "AsNGZoLtMHxFJux4tzkFjqJa2yq9iYmYhPkGNTK1FmTN"
+}]
 export const SolanaPoolStakeView: FC = ({ }) => {
   const wallet = useAnchorWallet();
 
+  const router = useRouter();
 
   return (
     <div className="container mx-auto max-w-6xl p-8 2xl:px-0">
       <div className={styles.container}>
-        <div className="navbar mb-2 shadow-lg bg-neutral text-neutral-content rounded-box">
-          <div className="flex-none">
-            <button className="btn btn-square btn-ghost">
-              <span className="text-4xl">🌔</span>
-            </button>
-          </div>
-          <div className="flex-1 px-2 mx-2">
-            <div className="text-sm breadcrumbs">
-              <ul className="text-xl">
+        <div className="navbar mb-2 shadow-lg bg-neutral text-neutral-content rounded-box justify-between">
+          <div className="flex gap-3">
 
-                <li>
-                  <span className="opacity-40">minh352623</span>
-                </li>
-              </ul>
+            <div className="flex-none">
+              <button className="btn btn-square btn-ghost">
+                <span className="text-4xl">🌔</span>
+              </button>
+            </div>
+            <div className="flex-1 px-2 mx-2">
+              <div className="text-sm breadcrumbs">
+                <ul className="text-xl">
+
+                  <li>
+                    <span className="opacity-40">minh352623</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
+          <Navbar></Navbar>
 
           <div className="flex-none">
             <WalletMultiButton className="btn btn-ghost" />
@@ -119,7 +131,7 @@ export const SolanaPoolStakeView: FC = ({ }) => {
           {!wallet ? (
             <SelectAndConnectWalletButton onUseWalletClick={() => { }} />
           ) : (
-            <SwapScreen />
+            <StakingScreen />
           )}
         </div>
       </div>
@@ -127,13 +139,13 @@ export const SolanaPoolStakeView: FC = ({ }) => {
   );
 };
 
-const SwapScreen = () => {
+const StakingScreen = () => {
   return (
     <div className="rounded-lg flex justify-center">
 
       <div className="flex flex-col items-center justify-center">
         <div className="text-xs">
-          <NetSwap />
+          <NetStaking />
 
         </div>
 
@@ -142,7 +154,7 @@ const SwapScreen = () => {
   );
 };
 
-type NetSwap = {
+type NetStaking = {
   // onSwapSent: (t: any) => void;
 };
 
@@ -151,7 +163,9 @@ interface IPoolInit {
   none: number,
   min_duration: number,
   max_duration: number,
-  max_weight: number
+  max_weight: number,
+  block_time: number,
+  token_on_block_time: number
 }
 
 interface IInfoToken {
@@ -163,7 +177,7 @@ export const GlobalState = {
   SEED: "global_state",
 };
 
-const NetSwap: FC<NetSwap> = ({ }) => {
+const NetStaking: FC<NetStaking> = ({ }) => {
   const wallet: any = useAnchorWallet();
   const wallet2 = useWallet()
   const { program } = useProgram({ connection, wallet });
@@ -175,7 +189,9 @@ const NetSwap: FC<NetSwap> = ({ }) => {
     none: 0,
     min_duration: 0,
     max_duration: 31536000 * 4,
-    max_weight: 4
+    max_weight: 4,
+    block_time: 1,
+    token_on_block_time: 10
   })
   const [tokenReward, setTokenReward] = useState<string>("")
   const [infoTokens, setInfoTokens] = useState<any[]>([])
@@ -251,35 +267,29 @@ const NetSwap: FC<NetSwap> = ({ }) => {
 
     ]
   )
-
   const [poolStakeSelect, setPoolStakeSelect] = useState<IInfoPoolStake>({
     "authority": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
-    "mint": "HswdwZUEAavy8G48qSQEFDpQBqDrpzEUxEm2JMDjANKB",
-    "stakeMint": "2QXc1Xg1YyAZG83uCzRTHuZVNLFsXmG4WBsyc29CMQ9D",
-    "vault": "Cd857YP77LKugMrpBWSdfWDNAUU6dRJa6fM4b73jBMht",
+    "mint": "6gCufJNt1paJfmiqoNiM2bCyQ7iW9rFLCS69xwsa2A1J",
+    "stakeMint": "4wGeiMqngLiNARmUtMZZzr8qeGYzduq6ypquvPEWfeJP",
+    "vault": "APcf4hWSXgPiZsqzK7e17daw3tuUe2B9juGxVjkcfmJW",
     "creator": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
-    "totalWeightedStake": "",
+    "totalWeightedStake": "0",
     "base_weight": "1000000000",
-    "max_weight": "5000000000",
+    "max_weight": "4000000000",
     "min_duration": "1000",
     "max_duration": "31536000",
-    "pool_key": "7LiC86n7YWVv9ySwB8GvV7xkszd7moGA4Wdyn7guc9qA",
-    "pool_rewards": []
+    "pool_key": "6cBuKbMhNGSozroFphKQSMzzqqeyNknnnW5PCsLxHvD1",
+    "pool_rewards": [{
+      mint_address: "E4vrHiRWK6JDVjrwAz5UHApKN5tSBQuLe6YeESBihG91"
+    },
+    {
+      mint_address: "AsNGZoLtMHxFJux4tzkFjqJa2yq9iYmYhPkGNTK1FmTN"
+    }
+    ],
+    "block_time": "10",
+    "token_on_block_time": "1",
+    "originPayer":""
   })
-  // {
-  //   "authority": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
-  //   "mint": "GHANstGTbisEQ3wYo5soc6pXtr3yUCkNckP9nFkiZScH",
-  //   "stakeMint": "CxpkQL5Y96H5opHp1mzHinSuX7GCe3FMAYVSDqJGzJ9d",
-  //   "vault": "rXdRpQyGCxBuje1FXrDe1PUzzhRn3sXVAyVBABC4bWF",
-  //   "creator": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
-  //   "totalWeightedStake": "0",
-  //   "base_weight": "1000000000",
-  //   "max_weight": "3000000000",
-  //   "min_duration": "1000",
-  //   "max_duration": "31536000",
-  //   "pool_key":"B3ULFQeTDB3AgzzB8ytdR4ZaAv2y3wG3JyyCTtEuGYhh",
-  //   "pool_rewards":[]
-  // }
 
 
   function isNumeric(value: any) {
@@ -321,7 +331,6 @@ const NetSwap: FC<NetSwap> = ({ }) => {
   // admin
   const inittialPool = async (data: IPoolInit) => {
     console.log("🚀 ~ inittialPool ~ data:", data)
-    // return;
     try {
       if (!program) return;
       console.log("🚀 ~ inittialPool ~ program:", program)
@@ -333,6 +342,8 @@ const NetSwap: FC<NetSwap> = ({ }) => {
       const min_duration = new anchor.BN(data.min_duration);
       const max_duration = new anchor.BN(data.max_duration); // 1 year in seconds 31536000
       const max_weight = new anchor.BN(data.max_weight * parseInt(SCALE_FACTOR_BASE.toString()));
+      const blockTime = new anchor.BN((data.block_time));
+      const tokenOnBlockTime = new anchor.BN((data.token_on_block_time));
 
 
       const mintToBeStaked = new anchor.web3.PublicKey(
@@ -360,7 +371,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
 
 
       const signature: string = await program.methods
-        .initializeStakePool(nonce, max_weight, min_duration, max_duration)
+        .initializeStakePool(nonce, max_weight, min_duration, max_duration, blockTime, tokenOnBlockTime)
         .accounts({
           payer: wallet.publicKey,
           authority: authority,
@@ -402,12 +413,15 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         vault: (stakePool as any).vault.toString(),
         creator: (stakePool as any).creator.toString(),
         totalWeightedStake: Number((stakePool as any).totalWeightedStake).toString(),
-        base_weight: Number((stakePool as any).baseWeight).toString(),
-        max_weight: Number((stakePool as any).maxWeight).toString(),
-        min_duration: Number((stakePool as any).minDuration).toString(),
-        max_duration: Number((stakePool as any).maxDuration).toString(),
-        pool_key: stakepool_key.toString(),
-        pool_rewards: []
+        baseWeight: Number((stakePool as any).baseWeight).toString(),
+        maxWeight: Number((stakePool as any).maxWeight).toString(),
+        minDuration: Number((stakePool as any).minDuration).toString(),
+        maxDuration: Number((stakePool as any).maxDuration).toString(),
+        poolKey: stakepool_key.toString(),
+        poolRewards: [],
+        blockTime: Number((stakePool as any).blockTime).toString(),
+        tokenOnBlockTime: Number((stakePool as any).tokenOnBlockTime).toString(),
+        originPayer: wallet.publicKey
       })
       setLoading(false)
     } catch (err) {
@@ -437,6 +451,9 @@ const NetSwap: FC<NetSwap> = ({ }) => {
       max_weight: Number((stakePool as any).maxWeight),
       min_duration: Number((stakePool as any).minDuration),
       max_duration: Number((stakePool as any).maxDuration),
+      block_time: Number((stakePool as any).blockTime),
+      token_on_block_time: Number((stakePool as any).tokenOnBlockTime),
+
     });
   }
 
@@ -485,6 +502,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
     }
   }
   const addReward = async (tokenAddress: string, amount: number) => {
+    console.log("🚀 ~ addReward ~ amount:", amount)
     if (!program) return;
     try {
       setLoading(true)
@@ -492,6 +510,8 @@ const NetSwap: FC<NetSwap> = ({ }) => {
 
       const stakepool_key = new anchor.web3.PublicKey(poolStakeSelect.pool_key);
       const rewardMint = new anchor.web3.PublicKey(tokenAddress);
+      const mint = await getMint(connection, rewardMint)
+      console.log("🚀 ~ addReward ~ mint:", mint)
       const [rewardVaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
         [
           stakepool_key.toBuffer(),
@@ -500,7 +520,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         ],
         program.programId
       );
-      const totalReward = amount * 1_000_000_000;
+      const totalReward = amount * 10 ** mint.decimals;
       const transferIx = createTransferInstruction(
         getAssociatedTokenAddressSync(rewardMint, pr0_pub),
         rewardVaultKey,
@@ -530,14 +550,11 @@ const NetSwap: FC<NetSwap> = ({ }) => {
 
   }
 
+
   // client 
   const depositStakingSplToken = async () => {
     try {
       if (!program) return;
-
-
-
-      console.log("🚀 ~ depositStakingSplToken ~ poolStakeSelect:", poolStakeSelect)
 
       const mintToBeStaked = new anchor.web3.PublicKey(
         poolStakeSelect.mint
@@ -575,7 +592,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
       );
       console.log("🚀 ~ depositStakingSplToken ~ mintToBeStakedAccount:", mintToBeStakedAccount.toString())
 
-      const deposit1Amount = new anchor.BN(7_000_000_000);
+      const deposit1Amount = new anchor.BN(10_000_000_000);
       const min_duration = new anchor.BN(1000);
 
 
@@ -601,25 +618,9 @@ const NetSwap: FC<NetSwap> = ({ }) => {
       );
 
       console.log("🚀 ~ depositStakingSplToken ~ stakeReceiptKey:", stakeReceiptKey.toString())
-      // const [rewardVaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
-      //   [
-      //     stakepool_key.toBuffer(),
-      //     rewardMint1.toBuffer(),
-      //     Buffer.from("rewardVault", "utf-8"),
-      //   ],
-      //   program.programId
-      // );
 
-      // const [rewardVaultKey2] = anchor.web3.PublicKey.findProgramAddressSync(
-      //   [
-      //     stakepool_key.toBuffer(),
-      //     rewardMint2.toBuffer(),
-      //     Buffer.from("rewardVault", "utf-8"),
-      //   ],
-      //   program.programId
-      // );
       // console.log("🚀 ~ depositStakingSplToken ~ rewardVaultKey:", rewardVaultKey.toString())
-      const arr = poolStakeSelect.pool_rewards.map(reward => {
+      const arr = poolStakeSelect.pool_rewards.map((reward: any) => {
         const [rewardVaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
           [
             stakepool_key.toBuffer(),
@@ -646,8 +647,8 @@ const NetSwap: FC<NetSwap> = ({ }) => {
 
       const rewardsTransferAmount = new anchor.BN(10_000_000_000);
       const fee_token_spl = new anchor.web3.PublicKey("75khJVhdfu9t4teJkRL3RaE1KZaWXsFNS5nfZRsNwGvQ");
-      const to = new  anchor.web3.PublicKey("5QPgJLMcF6v1dBCouNTsoJrCjoQ8DCPH2PPZCZNNYKP6")
-      const detination = getAssociatedTokenAddressSync(fee_token_spl,to);
+      const to = new anchor.web3.PublicKey("5QPgJLMcF6v1dBCouNTsoJrCjoQ8DCPH2PPZCZNNYKP6")
+      const detination = getAssociatedTokenAddressSync(fee_token_spl, to);
       console.log("🚀 ~ depositStakingSplToken ~ detination:", detination.toString())
       const source = getAssociatedTokenAddressSync(fee_token_spl, wallet.publicKey)
       console.log("🚀 ~ depositStakingSplToken ~ source:", source.toString())
@@ -657,6 +658,14 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         wallet.publicKey,
         rewardsTransferAmount.toNumber()
       );
+      const list_deposit = await fetchAllReceipt();
+      const receipts = list_deposit.map((deposit) => {
+        return {
+          pubkey: new anchor.web3.PublicKey(deposit.publicKey.toString()),
+          isWritable: true,
+          isSigner: false,
+        }
+      })
       await program.methods
         .deposit(nextNonce, deposit1Amount, min_duration)
         .accounts({
@@ -671,7 +680,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
           tokenProgram: TOKEN_PROGRAM_ID,
           rent: anchor.web3.SYSVAR_RENT_PUBKEY,
           systemProgram: anchor.web3.SystemProgram.programId,
-          globalState:globalStateAddress
+          globalState: globalStateAddress
         })
         // .remainingAccounts([
         //   {
@@ -685,7 +694,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         //     isSigner: false,
         //   },
         // ])
-        .remainingAccounts(arr)
+        .remainingAccounts([...arr, ...receipts])
         .preInstructions([transferIx])
         .rpc({ skipPreflight: true });
 
@@ -911,6 +920,22 @@ const NetSwap: FC<NetSwap> = ({ }) => {
           },
         ]
       })
+
+
+      const list_deposit = await fetchAllReceipt();
+      const receipts = list_deposit.map((deposit) => {
+        if (deposit.publicKey.toString() != stakeReceiptKey.toString()) {
+
+          return {
+            pubkey: new anchor.web3.PublicKey(deposit.publicKey.toString()),
+            isWritable: true,
+            isSigner: false,
+          }
+        }
+
+      })
+      const receipts_fater_filter: any[] = receipts.filter(item => item != undefined)
+      console.log("🚀 ~ withfraw ~ receipts_fater_filter:", receipts_fater_filter[0]?.pubkey.toString())
       await program.methods
         .withdraw()
         .accounts({
@@ -925,7 +950,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
           from: stakeMintAccountKey.address,
           destination: mintToBeStakedAccount,
         })
-        .remainingAccounts(remainingAccounts.flat())
+        .remainingAccounts([...remainingAccounts.flat(), ...receipts_fater_filter])
         .rpc({ skipPreflight: true });
     } catch (err) {
       console.log("🚀 ~ withfraw ~ err:", err)
@@ -1181,10 +1206,10 @@ const NetSwap: FC<NetSwap> = ({ }) => {
   async function updateInfoTokens(infoTokens: any[]) {
     try {
       const updatedTokens = await Promise.all(infoTokens.map(async (token) => {
-        const metadata: any = await getTokenMetadata(token.mintAddress);
+        const metadata: any = await getMetadataNew(token.mintAddress);
         return {
           ...token,
-          ...metadata.json // Assuming metadata has a `.json` property that you want to merge
+          ...metadata // Assuming metadata has a `.json` property that you want to merge
         };
       }));
 
@@ -1272,10 +1297,12 @@ const NetSwap: FC<NetSwap> = ({ }) => {
 
     const MINT_TO_SEARCH = addressToken
     try {
-
       const metaplex = Metaplex.make(connection);
 
       const tokenAddress = new anchor.web3.PublicKey(MINT_TO_SEARCH);
+
+      // const data = await getMetadataNew(tokenAddress.toString())
+      // console.log("🚀 ~ getTokenMetadata ~ data:", data)
 
       let nft = await metaplex.nfts().findByMint({ mintAddress: tokenAddress });
 
@@ -1285,10 +1312,57 @@ const NetSwap: FC<NetSwap> = ({ }) => {
     }
   }
 
+  const getMetadataNew = async (address: string) => {
+    console.log("🚀 ~ getMetadataNew ~ address---------------------:", address)
+    const config = new UtlConfig({
+      /**
+       * 101 - mainnet, 102 - testnet, 103 - devnet
+       */
+      chainId: 103,
+      /**
+       * number of miliseconds to wait until falling back to CDN
+       */
+      timeout: 2000,
+      /**
+       * Solana web3 Connection
+       */
+      connection: new anchor.web3.Connection(anchor.web3.clusterApiUrl("devnet")),
+      /**
+       * Backend API url which is used to query tokens
+       */
+      apiUrl: "https://token-list-api.solana.cloud",
+      /**
+       * CDN hosted static token list json which is used in case backend is down
+       */
+      cdnUrl: "https://cdn.jsdelivr.net/gh/solflare-wallet/token-list/solana-tokenlist.json"
+    });
+    const tokenMint = new anchor.web3.PublicKey(address);
+    const utl = new Client(config);
+    const token: Token = await utl.fetchMint(tokenMint);
+    console.log("🚀 ~ getMetadataNew ~ token:", token);
+    return token;
+  }
+
   // api
   const updatePoolStake = async (mint_address: string, amount = 0) => {
     try {
-      const result = await apiPoolStaking.updateInfoPoolStaking({ authority: wallet.publicKey.toString(), poolKey: poolStakeSelect.pool_key, pool_rewards: [...poolStakeSelect.pool_rewards, { mint_address: mint_address, amount }] });
+      let rewardsNew: any[] = [];
+      if (poolStakeSelect.pool_rewards.find((reward: any) => reward.mint_address == mint_address)) {
+        poolStakeSelect.pool_rewards.forEach((reward: any) => {
+          if (reward.mint_address == mint_address) {
+            reward.amount += reward.amount ? reward.amount + amount : amount;
+          }
+          rewardsNew.push(reward)
+        })
+      } else {
+        rewardsNew = [...poolStakeSelect.pool_rewards]
+        rewardsNew.push({
+          mint_address,
+          amount
+        })
+      }
+
+      const result = await apiPoolStaking.updateInfoPoolStaking({ authority: wallet.publicKey.toString(), poolKey: poolStakeSelect.pool_key, pool_rewards: rewardsNew });
       return result
     } catch (err) {
       console.log("🚀 ~ updatePoolStake ~ err:", err)
@@ -1297,9 +1371,9 @@ const NetSwap: FC<NetSwap> = ({ }) => {
   const getListPoolStake = async () => {
     try {
       const result = await apiPoolStaking.getAllPoolStakingByAuthority();
-      console.log("🚀 ~ getListPoolStake ~ data:", result.data.data)
-      setListPoolStake(result.data.data);
-      // setPoolStakeSelect(result.data.data[0]);
+      console.log("🚀 ~ getListPoolStake ~ data:", result)
+      setListPoolStake(result.data);
+      setPoolStakeSelect(result.data[result.data.length - 1]);
     } catch (err) {
       console.log("🚀 ~ getListPoolStake ~ err:", err)
     }
@@ -1320,15 +1394,19 @@ const NetSwap: FC<NetSwap> = ({ }) => {
   const getStatusLocked = async () => {
     if (!program) return;
     console.log("🚀 ~ getStatusLocked ~ program:", program)
+    const stakepool_key = new anchor.web3.PublicKey(poolStakeSelect.pool_key);
 
     const [globalStateAddress] = anchor.web3.PublicKey.findProgramAddressSync(
-      [Buffer.from(anchor.utils.bytes.utf8.encode(GlobalState.SEED))],
+      [
+        stakepool_key.toBuffer()
+        ,
+        Buffer.from("globalState")],
       program.programId
     );
     console.log("🚀 ~ getStatusLocked ~ globalStateAddress:", globalStateAddress);
-    const globalState = await program.account.globalState.fetch(globalStateAddress);
+    const globalState = await program.account.globalState.all();
 
-    console.log("Global State Data:", globalState.data);
+    console.log("Global State Data:", globalState);
   }
 
   const initGlobalState = async () => {
@@ -1351,7 +1429,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         globalState: globalStateAddress,
         payer: wallet.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
-        stakePool:stakepool_key
+        stakePool: stakepool_key
       })
       .rpc({ skipPreflight: true });
 
@@ -1376,28 +1454,47 @@ const NetSwap: FC<NetSwap> = ({ }) => {
       .accounts({
         globalState: globalStateAddress,
         authority: wallet.publicKey,
-        stakePool:stakepool_key
+        stakePool: stakepool_key
       })
       .rpc({ skipPreflight: true });
 
   }
 
-  const fetchAllReceipt = async ()=>{
-    if (!program) return;
+  const fetchAllReceipt = async () => {
+    if (!program) return [];
     console.log("🚀 ~ fetchAllReceipt ~ program:", program)
 
     const allReceipts = await program.account.stakeDepositReceipt.all();
     console.log("🚀 ~ fetchAllReceipt ~ allReceipts:", allReceipts)
-    allReceipts.forEach(item=>{
+    allReceipts.forEach(item => {
       console.log({
-        publicKey: item.publicKey.toString()
+        publicKey: item.publicKey.toString(),
+        percent: Number(item.account.percentCurrent),
+        amount_claimed: Number(item.account.amountClaimed),
+        lastUpdate: Number(item.account.lastTimeUpdate),
+        timeDeposit: Number(item.account.
+          depositTimestamp
+        ),
+        effective_stake: Number(item.account.
+          effectiveStake
+        ),
+
+        depositAmount: Number(item.account.
+          depositAmount
+        ),
+
+        timeLimit: new Date((Number(item.account.
+          depositTimestamp
+        ) * 1000) + 1000 * 1000),
       });
-      
+
     })
+
+    return allReceipts
   }
 
   return (
-    <div style={{ minWidth: 240 }} className="mb-8   flex  flex-col gap-5">
+    <div style={{ minWidth: 240 }} className="mb-8   flex  w-[600px] flex-col gap-5">
       <div className="w-full border-b border-gray-500 pb-4">
         <div className="flex gap-3">
           <div className="flex flex-col gap-2 w-[70%]">
@@ -1421,7 +1518,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
 
         </div>
         <div className="flex gap-3">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 flex-1">
             <span>Min Duration</span>
             <input name="min_duration" onChange={(e) => {
               const value = e.target.value;
@@ -1431,7 +1528,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
             } placeholder="Min Duration" className="mb-4"></input>
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 flex-1">
             <span>Max Duration</span>
             <input name="max_duration" onChange={(e) => {
               const value = e.target.value;
@@ -1444,7 +1541,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         </div>
 
         <div className="flex gap-3">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 flex-1">
             <span>Min Weight</span>
             <input name="minWeight" value={0} readOnly onChange={(e) => {
               const value = e.target.value;
@@ -1453,7 +1550,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
             }
             } placeholder="Min Weight" className="mb-4"></input>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 flex-1">
             <span>Max Weight</span>
             <input name="max_weight" onChange={(e) => {
               const value = e.target.value;
@@ -1461,6 +1558,28 @@ const NetSwap: FC<NetSwap> = ({ }) => {
               setValueToPoolInfo(nameKey, value)
             }
             } placeholder="Max Weight" className="mb-4"></input>
+          </div>
+
+        </div>
+
+        <div className="flex gap-3">
+          <div className="flex flex-col gap-2 flex-1">
+            <span>Block Time</span>
+            <input name="block_time" onChange={(e) => {
+              const value = e.target.value;
+              const nameKey = "block_time"
+              setValueToPoolInfo(nameKey, value)
+            }
+            } placeholder="Min Weight" className="mb-4"></input>
+          </div>
+          <div className="flex flex-col gap-2 flex-1">
+            <span>Token On Block Time</span>
+            <input name="token_on_block_time" onChange={(e) => {
+              const value = e.target.value;
+              const nameKey = "token_on_block_time"
+              setValueToPoolInfo(nameKey, value)
+            }
+            } placeholder="Token On Block Time" className="mb-4"></input>
           </div>
 
         </div>
@@ -1511,10 +1630,10 @@ const NetSwap: FC<NetSwap> = ({ }) => {
         <h1 className="mb-5 text-3xl text-center">
           Add Token To Pool Reward
         </h1>
-        {poolStakeSelect?.pool_rewards.length > 0 && poolStakeSelect?.pool_rewards?.map((reward: { mint_address: string; }, index: Key | null | undefined) => {
+        {poolStakeSelect?.pool_rewards?.length > 0 && poolStakeSelect?.pool_rewards?.map((reward: { mint_address: string; }, index: Key | null | undefined) => {
           return <div key={index} className="flex gap-3">
             <div className="flex gap-2">
-              <img src={infoTokens.find(token => token.mintAddress === reward.mint_address)?.image}
+              <img src={infoTokens.find(token => token.mintAddress === reward.mint_address)?.logoURI}
                 className="w-[40px] h-[40px] rounded-full"
                 alt="" />
               <div className="flex flex-col gap-1">
@@ -1588,7 +1707,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
 
       <button
         className="btn btn-primary rounded-full normal-case	w-full"
-        onClick={() => getInfoPool("5hkcBdcYoRNs6ZgwHj3S6YJmFKqWQwmh2Ukneuk56nhN")
+        onClick={() => getInfoPool("Ewkh2xUYtCpWMF3B9SMicngSK2YAi93KNT1VZ676nQXW")
 
         }
         style={{ minHeight: 0, height: 40 }}
@@ -1635,7 +1754,7 @@ const NetSwap: FC<NetSwap> = ({ }) => {
       >
         lockPool
       </button>
-      
+
       <button
         className="btn btn-primary rounded-full normal-case	w-full"
         onClick={() => fetchAllReceipt()
