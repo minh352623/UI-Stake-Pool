@@ -569,6 +569,7 @@ const NetStaking: FC<NetStaking> = ({ }) => {
   const depositStakingSplToken = async () => {
     try {
       if (!program) return;
+      console.log("🚀 ~ depositStakingSplToken ~ program:", program)
 
       const mintToBeStaked = new anchor.web3.PublicKey(
         poolStakeSelect.mint
@@ -693,6 +694,9 @@ const NetStaking: FC<NetStaking> = ({ }) => {
         }
       })
       if (craeteAccountIntruction) {
+        // program.coder.instruction.
+
+
         await program.methods
         .deposit(nextNonce, deposit1Amount, min_duration)
         .accounts({
