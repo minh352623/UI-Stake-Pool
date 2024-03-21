@@ -94,6 +94,14 @@ export type SplTokenStaking = {
         {
           "name": "tokenOnBlockTime",
           "type": "u64"
+        },
+        {
+          "name": "blockTimeWithdrawOrigin",
+          "type": "u64"
+        },
+        {
+          "name": "rangeWithdrawProfit",
+          "type": "u64"
         }
       ]
     },
@@ -440,6 +448,95 @@ export type SplTokenStaking = {
           "docs": [
             "Token account to transfer the previously staked token to"
           ]
+        },
+        {
+          "name": "globalState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "walletAdmin",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdrawProfits",
+      "accounts": [
+        {
+          "name": "claimBase",
+          "accounts": [
+            {
+              "name": "owner",
+              "isMut": true,
+              "isSigner": true,
+              "docs": [
+                "Owner of the StakeDepositReceipt"
+              ]
+            },
+            {
+              "name": "stakePool",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "stakeDepositReceipt",
+              "isMut": true,
+              "isSigner": false,
+              "docs": [
+                "StakeDepositReceipt of the owner that will be used to claim respective rewards"
+              ]
+            },
+            {
+              "name": "tokenProgram",
+              "isMut": false,
+              "isSigner": false
+            }
+          ]
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Vault of the StakePool token will be transferred from"
+          ]
+        },
+        {
+          "name": "stakeMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "stake_mint of StakePool that will be burned"
+          ]
+        },
+        {
+          "name": "from",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Token Account holding weighted stake representation token to burn"
+          ]
+        },
+        {
+          "name": "destination",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Token account to transfer the previously staked token to"
+          ]
+        },
+        {
+          "name": "globalState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "walletAdmin",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": []
@@ -787,6 +884,14 @@ export type SplTokenStaking = {
           {
             "name": "tokenOnBlockTime",
             "type": "u64"
+          },
+          {
+            "name": "blockTimeWithdrawOrigin",
+            "type": "u64"
+          },
+          {
+            "name": "rangeWithdrawProfit",
+            "type": "i64"
           }
         ]
       }
@@ -871,8 +976,12 @@ export type SplTokenStaking = {
             "type": "u64"
           },
           {
-            "name": "test",
-            "type": "u64"
+            "name": "timeRanges",
+            "type": {
+              "vec": {
+                "defined": "TimeRange"
+              }
+            }
           }
         ]
       }
@@ -913,6 +1022,34 @@ export type SplTokenStaking = {
                 8
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TimeRange",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "from",
+            "type": "i64"
+          },
+          {
+            "name": "to",
+            "type": "i64"
+          },
+          {
+            "name": "percent",
+            "type": "f64"
+          },
+          {
+            "name": "timeWithdraw",
+            "type": "i64"
+          },
+          {
+            "name": "isWithdraw",
+            "type": "bool"
           }
         ]
       }
@@ -996,11 +1133,28 @@ export type SplTokenStaking = {
     },
     {
       "code": 6015,
-      "name": "TimeCalculationError"
+      "name": "TimeCalculationError",
+      "msg": "The resource is TimeCalculationError."
     },
     {
       "code": 6016,
-      "name": "CalculationOverflow"
+      "name": "CalculationOverflow",
+      "msg": "The resource is CalculationOverflow."
+    },
+    {
+      "code": 6017,
+      "name": "BlockTimeWithdrawOrigin",
+      "msg": "Block Time Withraw Origin."
+    },
+    {
+      "code": 6018,
+      "name": "WalletAdminError",
+      "msg": "Wallet Address Is Not Authorize."
+    },
+    {
+      "code": 6019,
+      "name": "NoAvailableSlot",
+      "msg": "No available slot for a new time range"
     }
   ]
 };
@@ -1101,6 +1255,14 @@ export const IDL: SplTokenStaking = {
         {
           "name": "tokenOnBlockTime",
           "type": "u64"
+        },
+        {
+          "name": "blockTimeWithdrawOrigin",
+          "type": "u64"
+        },
+        {
+          "name": "rangeWithdrawProfit",
+          "type": "u64"
         }
       ]
     },
@@ -1447,6 +1609,95 @@ export const IDL: SplTokenStaking = {
           "docs": [
             "Token account to transfer the previously staked token to"
           ]
+        },
+        {
+          "name": "globalState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "walletAdmin",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdrawProfits",
+      "accounts": [
+        {
+          "name": "claimBase",
+          "accounts": [
+            {
+              "name": "owner",
+              "isMut": true,
+              "isSigner": true,
+              "docs": [
+                "Owner of the StakeDepositReceipt"
+              ]
+            },
+            {
+              "name": "stakePool",
+              "isMut": true,
+              "isSigner": false
+            },
+            {
+              "name": "stakeDepositReceipt",
+              "isMut": true,
+              "isSigner": false,
+              "docs": [
+                "StakeDepositReceipt of the owner that will be used to claim respective rewards"
+              ]
+            },
+            {
+              "name": "tokenProgram",
+              "isMut": false,
+              "isSigner": false
+            }
+          ]
+        },
+        {
+          "name": "vault",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Vault of the StakePool token will be transferred from"
+          ]
+        },
+        {
+          "name": "stakeMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "stake_mint of StakePool that will be burned"
+          ]
+        },
+        {
+          "name": "from",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Token Account holding weighted stake representation token to burn"
+          ]
+        },
+        {
+          "name": "destination",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Token account to transfer the previously staked token to"
+          ]
+        },
+        {
+          "name": "globalState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "walletAdmin",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": []
@@ -1794,6 +2045,14 @@ export const IDL: SplTokenStaking = {
           {
             "name": "tokenOnBlockTime",
             "type": "u64"
+          },
+          {
+            "name": "blockTimeWithdrawOrigin",
+            "type": "u64"
+          },
+          {
+            "name": "rangeWithdrawProfit",
+            "type": "i64"
           }
         ]
       }
@@ -1878,8 +2137,12 @@ export const IDL: SplTokenStaking = {
             "type": "u64"
           },
           {
-            "name": "test",
-            "type": "u64"
+            "name": "timeRanges",
+            "type": {
+              "vec": {
+                "defined": "TimeRange"
+              }
+            }
           }
         ]
       }
@@ -1920,6 +2183,34 @@ export const IDL: SplTokenStaking = {
                 8
               ]
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TimeRange",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "from",
+            "type": "i64"
+          },
+          {
+            "name": "to",
+            "type": "i64"
+          },
+          {
+            "name": "percent",
+            "type": "f64"
+          },
+          {
+            "name": "timeWithdraw",
+            "type": "i64"
+          },
+          {
+            "name": "isWithdraw",
+            "type": "bool"
           }
         ]
       }
@@ -2003,11 +2294,28 @@ export const IDL: SplTokenStaking = {
     },
     {
       "code": 6015,
-      "name": "TimeCalculationError"
+      "name": "TimeCalculationError",
+      "msg": "The resource is TimeCalculationError."
     },
     {
       "code": 6016,
-      "name": "CalculationOverflow"
+      "name": "CalculationOverflow",
+      "msg": "The resource is CalculationOverflow."
+    },
+    {
+      "code": 6017,
+      "name": "BlockTimeWithdrawOrigin",
+      "msg": "Block Time Withraw Origin."
+    },
+    {
+      "code": 6018,
+      "name": "WalletAdminError",
+      "msg": "Wallet Address Is Not Authorize."
+    },
+    {
+      "code": 6019,
+      "name": "NoAvailableSlot",
+      "msg": "No available slot for a new time range"
     }
   ]
 };

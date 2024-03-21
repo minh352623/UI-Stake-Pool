@@ -16,6 +16,8 @@ export interface IInfoPoolStake {
   block_time:string;
   token_on_block_time:string;
   originPayer: string;
+  block_time_withdraw_origin?:string;
+  range_time_withdraw_profits?: string
 }
 
 export interface IInfoPoolStakeCreate {

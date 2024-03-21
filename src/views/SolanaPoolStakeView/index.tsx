@@ -12,7 +12,7 @@ import { SolanaLogo } from "components";
 import styles from "./index.module.css";
 import { swap } from "./swap";
 import { useProgram } from "./useProgram";
-import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, createMintToInstruction, createTransferInstruction, getAssociatedTokenAddressSync, getMint, getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
+import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, createMintToInstruction, createTransferInstruction, getAssociatedTokenAddress, getAssociatedTokenAddressSync, getMint, getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 import { SPL_TOKEN_PROGRAM_ID, splTokenProgram } from "@coral-xyz/spl-token";
 import { getNextUnusedStakeReceiptNonce } from "@mithraic-labs/token-staking";
 import { SplTokenStaking } from "./spl_token_staking";
@@ -74,10 +74,10 @@ const connection = new anchor.web3.Connection(endpoint);
 
 // ]
 
-const rewards = [{
-  mint_address: "E4vrHiRWK6JDVjrwAz5UHApKN5tSBQuLe6YeESBihG91"
-}, {
-  mint_address: "AsNGZoLtMHxFJux4tzkFjqJa2yq9iYmYhPkGNTK1FmTN"
+const rewards = [ {
+  mint_address:"Avop6BWTdg2zfrdr7Pwk1tWbhpMJvcP3Zu1DtqUqeBEG"
+},{
+  mint_address:"HxJyGSBmcscHLWysxMdVNZwY9yjYJBETy3T4EGw69mKP"
 }]
 export const SolanaPoolStakeView: FC = ({ }) => {
   const wallet = useAnchorWallet();
@@ -129,7 +129,7 @@ export const SolanaPoolStakeView: FC = ({ }) => {
 
         <div className="flex justify-center">
           {!wallet ? (
-            <SelectAndConnectWalletButton onUseWalletClick={() => { }} />
+            <SelectAndConnectWalletButton  onUseWalletClick={() => { }} />
           ) : (
             <StakingScreen />
           )}
@@ -165,7 +165,9 @@ interface IPoolInit {
   max_duration: number,
   max_weight: number,
   block_time: number,
-  token_on_block_time: number
+  token_on_block_time: number,
+  block_time_withdraw_origin:number,
+  range_time_withdraw_profits:number
 }
 
 interface IInfoToken {
@@ -179,7 +181,7 @@ export const GlobalState = {
 
 const NetStaking: FC<NetStaking> = ({ }) => {
   const wallet: any = useAnchorWallet();
-  const wallet2 = useWallet()
+  const wallet2 = useWallet();
   const { program } = useProgram({ connection, wallet });
   console.log("🚀 ~ program:", program)
   const [amountReward, setAmountReward] = useState<number>(0);
@@ -191,7 +193,9 @@ const NetStaking: FC<NetStaking> = ({ }) => {
     max_duration: 31536000 * 4,
     max_weight: 4,
     block_time: 1,
-    token_on_block_time: 10
+    token_on_block_time: 10,
+    block_time_withdraw_origin : 0,
+    range_time_withdraw_profits:0
   })
   const [tokenReward, setTokenReward] = useState<string>("")
   const [infoTokens, setInfoTokens] = useState<any[]>([])
@@ -268,29 +272,31 @@ const NetStaking: FC<NetStaking> = ({ }) => {
     ]
   )
   const [poolStakeSelect, setPoolStakeSelect] = useState<IInfoPoolStake>({
-    "authority": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
-    "mint": "6gCufJNt1paJfmiqoNiM2bCyQ7iW9rFLCS69xwsa2A1J",
-    "stakeMint": "4wGeiMqngLiNARmUtMZZzr8qeGYzduq6ypquvPEWfeJP",
-    "vault": "APcf4hWSXgPiZsqzK7e17daw3tuUe2B9juGxVjkcfmJW",
-    "creator": "7KFPvRysgywysfXYKhGdfec4FKy1uD5j94yHT7suLznG",
+    "authority": "DzguMtFxZkKGhpmrteBLhM6kDBadctp2nyjNY5nRhHfY",
+    "mint": "EoJUJwZ27Zkk5FbW6Zngcpuy4z5gTTCiyAi3YAi1qxWp",
+    "stakeMint": "HJTgYcmq98G2pRHVLr1Y15oh6skU6MzoCSZhqXjJuRrZ",
+    "vault": "JDyxpbHWJRQZ5GSkDQFAZ896dVMbGBbwvJLgfvUtRYHE",
+    "creator": "DzguMtFxZkKGhpmrteBLhM6kDBadctp2nyjNY5nRhHfY",
     "totalWeightedStake": "0",
     "base_weight": "1000000000",
     "max_weight": "4000000000",
-    "min_duration": "1000",
+    "min_duration": "300",
     "max_duration": "31536000",
-    "pool_key": "6cBuKbMhNGSozroFphKQSMzzqqeyNknnnW5PCsLxHvD1",
-    "pool_rewards": [{
-      mint_address: "E4vrHiRWK6JDVjrwAz5UHApKN5tSBQuLe6YeESBihG91"
-    },
-    {
-      mint_address: "AsNGZoLtMHxFJux4tzkFjqJa2yq9iYmYhPkGNTK1FmTN"
-    }
+    "pool_key": "EWuHhYrKRGghWqfYriBKqXgUetrCAZy951rt7tuUxBgt",
+    "pool_rewards": [
+      {
+        mint_address:"Avop6BWTdg2zfrdr7Pwk1tWbhpMJvcP3Zu1DtqUqeBEG"
+      },
+      {
+        mint_address:"HxJyGSBmcscHLWysxMdVNZwY9yjYJBETy3T4EGw69mKP"
+      }
     ],
-    "block_time": "10",
+    "block_time": "100",
     "token_on_block_time": "1",
-    "originPayer":""
+    "originPayer":"",
+    "block_time_withdraw_origin": "300",
+    "range_time_withdraw_profits" : "3000"
   })
-
 
   function isNumeric(value: any) {
     return /^[0-9]{0,9}(\.[0-9]{1,2})?$/.test(value);
@@ -331,6 +337,7 @@ const NetStaking: FC<NetStaking> = ({ }) => {
   // admin
   const inittialPool = async (data: IPoolInit) => {
     console.log("🚀 ~ inittialPool ~ data:", data)
+    // return;
     try {
       if (!program) return;
       console.log("🚀 ~ inittialPool ~ program:", program)
@@ -344,6 +351,8 @@ const NetStaking: FC<NetStaking> = ({ }) => {
       const max_weight = new anchor.BN(data.max_weight * parseInt(SCALE_FACTOR_BASE.toString()));
       const blockTime = new anchor.BN((data.block_time));
       const tokenOnBlockTime = new anchor.BN((data.token_on_block_time));
+      const block_time_withdraw_origin = new anchor.BN(data.block_time_withdraw_origin)
+      const range_time_withdraw_profits = new anchor.BN(data.range_time_withdraw_profits)
 
 
       const mintToBeStaked = new anchor.web3.PublicKey(
@@ -371,7 +380,7 @@ const NetStaking: FC<NetStaking> = ({ }) => {
 
 
       const signature: string = await program.methods
-        .initializeStakePool(nonce, max_weight, min_duration, max_duration, blockTime, tokenOnBlockTime)
+        .initializeStakePool(nonce, max_weight, min_duration, max_duration, blockTime, tokenOnBlockTime,block_time_withdraw_origin,range_time_withdraw_profits)
         .accounts({
           payer: wallet.publicKey,
           authority: authority,
@@ -404,6 +413,9 @@ const NetStaking: FC<NetStaking> = ({ }) => {
         max_weight: Number((stakePool as any).maxWeight),
         min_duration: Number((stakePool as any).minDuration),
         max_duration: Number((stakePool as any).maxDuration),
+        pool_key:stakepool_key.toString(),
+        block_time_withdraw_origin: (stakePool as any)?.blockTimeWithdrawOrigin?.toString()
+
       });
 
       apiPoolStaking.saveInfoPoolStaking({
@@ -463,6 +475,8 @@ const NetStaking: FC<NetStaking> = ({ }) => {
       setLoading(true)
       const rewardPoolIndex = poolStakeSelect.pool_rewards.length;
       const _authority = wallet.publicKey
+      // const _authority = new anchor.web3.PublicKey("DzguMtFxZkKGhpmrteBLhM6kDBadctp2nyjNY5nRhHfY")
+
       const stakepool_key = new anchor.web3.PublicKey(poolStakeSelect.pool_key);
       const rewardMint2 = new anchor.web3.PublicKey(mintTokenNew);
 
@@ -573,15 +587,27 @@ const NetStaking: FC<NetStaking> = ({ }) => {
       console.log("🚀 ~ depositStakingSplToken ~ stakeMint:", stakeMint.toString())
 
       // await importToken(stakeMint.toString());
-      const stakeMintAccountKey = await getOrCreateAssociatedTokenAccount(
-        connection,
-        wallet,
-        stakeMint,
-        wallet.publicKey,
-        false,
-      );
+      // const stakeMintAccountKey = await getOrCreateAssociatedTokenAccount(
+      //   connection,
+      //   wallet,
+      //   stakeMint,
+      //   wallet.publicKey,
+      //   false,
+      // );
 
-      console.log("🚀 ~ depositStakingSplToken ~ stakeMintAccountKey:", stakeMintAccountKey.address.toString())
+      const stakeMintAccountKey = await getAssociatedTokenAddress(stakeMint, wallet.publicKey);
+      const accountStakeMintAccountKey = await connection.getAccountInfo(stakeMintAccountKey)
+      let craeteAccountIntruction;
+      if (accountStakeMintAccountKey == null) {
+        craeteAccountIntruction = 
+            createAssociatedTokenAccountInstruction(
+              wallet.publicKey,
+              stakeMintAccountKey,
+              wallet.publicKey,
+              stakeMint
+            )
+      }
+      console.log("🚀 ~ depositStakingSplToken ~ stakeMintAccountKey:", stakeMintAccountKey.toString())
       // console.log("🚀 ~ depositStakingSplToken ~ stakeMintAccountKey2:", stakeMintAccountKey2.address.toString())
 
       const mintToBeStakedAccount = getAssociatedTokenAddressSync(
@@ -593,7 +619,7 @@ const NetStaking: FC<NetStaking> = ({ }) => {
       console.log("🚀 ~ depositStakingSplToken ~ mintToBeStakedAccount:", mintToBeStakedAccount.toString())
 
       const deposit1Amount = new anchor.BN(10_000_000_000);
-      const min_duration = new anchor.BN(1000);
+      const min_duration = new anchor.BN(600);
 
 
       // deposit
@@ -666,7 +692,8 @@ const NetStaking: FC<NetStaking> = ({ }) => {
           isSigner: false,
         }
       })
-      await program.methods
+      if (craeteAccountIntruction) {
+        await program.methods
         .deposit(nextNonce, deposit1Amount, min_duration)
         .accounts({
           payer: wallet.publicKey,
@@ -675,28 +702,37 @@ const NetStaking: FC<NetStaking> = ({ }) => {
           stakeMint,
           stakePool: stakepool_key,
           vault: vaultKey,
-          destination: stakeMintAccountKey.address,
+          destination: stakeMintAccountKey,
           stakeDepositReceipt: stakeReceiptKey,
           tokenProgram: TOKEN_PROGRAM_ID,
           rent: anchor.web3.SYSVAR_RENT_PUBKEY,
           systemProgram: anchor.web3.SystemProgram.programId,
           globalState: globalStateAddress
         })
-        // .remainingAccounts([
-        //   {
-        //     pubkey: rewardVaultKey,
-        //     isWritable: false,
-        //     isSigner: false,
-        //   },
-        //   {
-        //     pubkey: rewardVaultKey2,
-        //     isWritable: false,
-        //     isSigner: false,
-        //   },
-        // ])
         .remainingAccounts([...arr, ...receipts])
-        .preInstructions([transferIx])
+        .preInstructions([craeteAccountIntruction])
         .rpc({ skipPreflight: true });
+      }else{
+        await program.methods
+        .deposit(nextNonce, deposit1Amount, min_duration)
+        .accounts({
+          payer: wallet.publicKey,
+          owner: wallet.publicKey,
+          from: mintToBeStakedAccount,
+          stakeMint,
+          stakePool: stakepool_key,
+          vault: vaultKey,
+          destination: stakeMintAccountKey,
+          stakeDepositReceipt: stakeReceiptKey,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+          systemProgram: anchor.web3.SystemProgram.programId,
+          globalState: globalStateAddress
+        })
+        .remainingAccounts([...arr, ...receipts])
+        .rpc({ skipPreflight: true });
+      }
+  
 
 
     } catch (e) {
@@ -936,6 +972,21 @@ const NetStaking: FC<NetStaking> = ({ }) => {
       })
       const receipts_fater_filter: any[] = receipts.filter(item => item != undefined)
       console.log("🚀 ~ withfraw ~ receipts_fater_filter:", receipts_fater_filter[0]?.pubkey.toString())
+
+      const [globalStateAddress, globalStateBump] = anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          stakepool_key.toBuffer()
+
+          , Buffer.from("globalState")],
+        program.programId
+      );
+      const wallet_admin =  await getOrCreateAssociatedTokenAccount(
+        connection,
+        wallet,
+        mintToBeStaked,
+        new anchor.web3.PublicKey("DzguMtFxZkKGhpmrteBLhM6kDBadctp2nyjNY5nRhHfY"),
+        false,
+      );
       await program.methods
         .withdraw()
         .accounts({
@@ -949,6 +1000,137 @@ const NetStaking: FC<NetStaking> = ({ }) => {
           stakeMint,
           from: stakeMintAccountKey.address,
           destination: mintToBeStakedAccount,
+          globalState: globalStateAddress,
+          walletAdmin: wallet_admin.address
+
+          
+        })
+        .remainingAccounts([...remainingAccounts.flat(), ...receipts_fater_filter])
+        .rpc({ skipPreflight: true });
+    } catch (err) {
+      console.log("🚀 ~ withfraw ~ err:", err)
+    }
+  }
+  const withfraw_profit = async (receiptNonceNumber: number) => {
+    try {
+      if (!program) return;
+
+      const mintToBeStaked = new anchor.web3.PublicKey(
+        poolStakeSelect.mint
+      );
+      const stakepool_key = new anchor.web3.PublicKey(poolStakeSelect.pool_key);
+      const [vaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
+        [stakepool_key.toBuffer(), Buffer.from("vault", "utf-8")],
+        program.programId
+      );
+      console.log("🚀 ~ depositStakingSplToken ~ vaultKey:", vaultKey.toString())
+      const [stakeMint] = anchor.web3.PublicKey.findProgramAddressSync(
+        [stakepool_key.toBuffer(), Buffer.from("stakeMint", "utf-8")],
+        program.programId
+      );
+      // await importToken("J6boRtivt7qxWpMQHECpbzsZ6sUPLUDEMek8EeGLuCpY")
+      const stakeMintAccountKey = await getOrCreateAssociatedTokenAccount(
+        connection,
+        wallet,
+        stakeMint,
+        wallet.publicKey,
+        false,
+      );
+      const receiptNonce = receiptNonceNumber;
+      console.log("🚀 ~ withfraw ~ receiptNonce:", receiptNonce)
+      const mintToBeStakedAccount = getAssociatedTokenAddressSync(
+        mintToBeStaked,
+        wallet.publicKey,
+        false,
+        TOKEN_PROGRAM_ID
+      );
+      const [stakeReceiptKey] = anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          wallet.publicKey.toBuffer(),
+          stakepool_key.toBuffer(),
+          new anchor.BN(receiptNonce).toArrayLike(Buffer, "le", 4),
+          Buffer.from("stakeDepositReceipt", "utf-8"),
+        ],
+        program.programId
+      );
+      console.log("🚀 ~ withfraw ~ stakeReceiptKey  withdraw:", stakeReceiptKey.toString())
+
+      const remainingAccounts = poolStakeSelect.pool_rewards.map(reward => {
+
+        const [rewardVaultKey] = anchor.web3.PublicKey.findProgramAddressSync(
+          [
+            stakepool_key.toBuffer(),
+            new anchor.web3.PublicKey(reward.mint_address).toBuffer(),
+            Buffer.from("rewardVault", "utf-8"),
+          ],
+          program.programId
+        );
+
+        const depositorReward1AccountKey = getAssociatedTokenAddressSync(
+          new anchor.web3.PublicKey(reward.mint_address),
+          wallet.publicKey
+        );
+
+        return [
+          {
+            pubkey: rewardVaultKey,
+            isWritable: true,
+            isSigner: false,
+          },
+          {
+            pubkey: depositorReward1AccountKey,
+            isWritable: true,
+            isSigner: false,
+          },
+        ]
+      })
+
+
+      const list_deposit = await fetchAllReceipt();
+      const receipts = list_deposit.map((deposit) => {
+        if (deposit.publicKey.toString() != stakeReceiptKey.toString()) {
+
+          return {
+            pubkey: new anchor.web3.PublicKey(deposit.publicKey.toString()),
+            isWritable: true,
+            isSigner: false,
+          }
+        }
+
+      })
+      const receipts_fater_filter: any[] = receipts.filter(item => item != undefined)
+      console.log("🚀 ~ withfraw ~ receipts_fater_filter:", receipts_fater_filter[0]?.pubkey.toString())
+
+      const [globalStateAddress, globalStateBump] = anchor.web3.PublicKey.findProgramAddressSync(
+        [
+          stakepool_key.toBuffer()
+
+          , Buffer.from("globalState")],
+        program.programId
+      );
+
+      const wallet_admin =  await getOrCreateAssociatedTokenAccount(
+        connection,
+        wallet,
+        mintToBeStaked,
+        new anchor.web3.PublicKey("DzguMtFxZkKGhpmrteBLhM6kDBadctp2nyjNY5nRhHfY"),
+        false,
+      );
+      await program.methods
+        .withdrawProfits()
+        .accounts({
+          claimBase: {
+            owner: wallet.publicKey,
+            stakePool: stakepool_key,
+            stakeDepositReceipt: stakeReceiptKey,
+            tokenProgram: TOKEN_PROGRAM_ID,
+          },
+          vault: vaultKey,
+          stakeMint,
+          from: stakeMintAccountKey.address,
+          destination: mintToBeStakedAccount,
+          globalState: globalStateAddress,
+          walletAdmin: wallet_admin.address
         })
         .remainingAccounts([...remainingAccounts.flat(), ...receipts_fater_filter])
         .rpc({ skipPreflight: true });
@@ -1372,8 +1554,8 @@ const NetStaking: FC<NetStaking> = ({ }) => {
     try {
       const result = await apiPoolStaking.getAllPoolStakingByAuthority();
       console.log("🚀 ~ getListPoolStake ~ data:", result)
-      setListPoolStake(result.data);
-      setPoolStakeSelect(result.data[result.data.length - 1]);
+      // setListPoolStake(result.data);
+      // setPoolStakeSelect(result.data[result.data.length - 1]);
     } catch (err) {
       console.log("🚀 ~ getListPoolStake ~ err:", err)
     }
@@ -1486,7 +1668,22 @@ const NetStaking: FC<NetStaking> = ({ }) => {
         timeLimit: new Date((Number(item.account.
           depositTimestamp
         ) * 1000) + 1000 * 1000),
+
+        stake_one: Number((item.account?.timeRanges as any)[0].from)
+
       });
+
+      (item.account as  any)?.timeRanges.forEach((item:any)=>{
+        console.log({
+          from: Number(item.from),
+          to: Number(item.to),
+          timeWithdraw: Number(item.timeWithdraw),
+          percent: Number(item.percent),
+          isWithdraw: item.isWithdraw,
+
+
+        });
+      })
 
     })
 
@@ -1580,6 +1777,28 @@ const NetStaking: FC<NetStaking> = ({ }) => {
               setValueToPoolInfo(nameKey, value)
             }
             } placeholder="Token On Block Time" className="mb-4"></input>
+          </div>
+
+        </div>
+
+        <div className="flex gap-3">
+          <div className="flex flex-col gap-2 flex-1">
+            <span>Block Time Withdraw Origin</span>
+            <input name="block_time_withdraw_origin" onChange={(e) => {
+              const value = e.target.value;
+              const nameKey = "block_time_withdraw_origin"
+              setValueToPoolInfo(nameKey, value)
+            }
+            } placeholder="Block Time Withdraw Origin" className="mb-4"></input>
+          </div>
+          <div className="flex flex-col gap-2 flex-1">
+            <span>Range Time Withdraw Profits</span>
+            <input name="range_time_withdraw_profits" onChange={(e) => {
+              const value = e.target.value;
+              const nameKey = "range_time_withdraw_profits"
+              setValueToPoolInfo(nameKey, value)
+            }
+            } placeholder="Block Time Withdraw Origin" className="mb-4"></input>
           </div>
 
         </div>
@@ -1681,6 +1900,14 @@ const NetStaking: FC<NetStaking> = ({ }) => {
 
       <button
         className="btn btn-primary rounded-full normal-case	w-full"
+        onClick={() => withfraw_profit(0)}
+        style={{ minHeight: 0, height: 40 }}
+      >
+        Withdraw profit
+      </button>
+      
+      <button
+        className="btn btn-primary rounded-full normal-case	w-full"
         onClick={() => claimReward(0)}
         style={{ minHeight: 0, height: 40 }}
       >
@@ -1707,7 +1934,7 @@ const NetStaking: FC<NetStaking> = ({ }) => {
 
       <button
         className="btn btn-primary rounded-full normal-case	w-full"
-        onClick={() => getInfoPool("Ewkh2xUYtCpWMF3B9SMicngSK2YAi93KNT1VZ676nQXW")
+        onClick={() => getInfoPool("CdaVSfbAiqcCtWej6tTVXzJuSbA22JD7ApFmEhRSy4Mg")
 
         }
         style={{ minHeight: 0, height: 40 }}

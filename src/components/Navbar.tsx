@@ -20,6 +20,10 @@ const Navbar = () => {
 
                     <Link href="/pool-swap">Pool Swap</Link>
                 </li>
+                <li className={router.pathname == "/pool-swap-two" ? " text-yellow-500 font-bold" : ""}>
+
+<Link href="/pool-swap-two">Pool Swap Two</Link>
+</li>
 
 
             </ul>

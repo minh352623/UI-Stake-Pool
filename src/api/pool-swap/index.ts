@@ -18,6 +18,9 @@ class PoolSwaping {
             method:"POST",
             url:"https://sol-est-fee-create-lp.default.teknix.dev",
             data,
+            headers:{
+                'Content-Type': 'application/json'
+            }
         })
         return result;
     }

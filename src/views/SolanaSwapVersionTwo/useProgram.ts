@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import * as anchor from "@project-serum/anchor";
-import { IDL } from "./spl_token_staking-version-2";
+import { IDL } from "./anchor_liquidity_pool";
 
 // import { IDL } from "./spl_token_staking";
 
@@ -33,9 +33,30 @@ export const useProgram = ({ connection, wallet }: ProgramProps) => {
     const provider = new anchor.AnchorProvider(connection, wallet,{ commitment: "confirmed" });
     console.log("provider", provider);
 
+    //   const idl = await anchor.Program.fetchIdl(programID, provider);
+    //   console.log("idl", idl);
+
+    // const programID = new PublicKey(idl.metadata.address);
+    // const program = new anchor.Program(idl as any, programID, provider);
+    // setProgram(program);
+    // const programId = new anchor.web3.PublicKey(
+    //   "9TemRuwmBFsgkss4HiqvpKugVHpRR7vVc7aufiPGn9qA"
+    // );
+    // const programId = new anchor.web3.PublicKey(
+    //   "3zCun8eH7bsbqE35xCoyUAX78fp3FHsiUpaBLa8BfGes"
+    // );
+
+    // const programId = new anchor.web3.PublicKey(
+    //   "91LHxw5aWQXdQRWanFUQksHLCodqRNDzqoh9ec3Yksoo"
+    // );
+
+    // const programId = new anchor.web3.PublicKey(
+    //   "CuzpaZTaApgQj6HKhVLRzJisi1Y6Tn2Yt7CsjacTmbMz"
+    // );
+
     //version 2
 
-    const programId = new anchor.web3.PublicKey("FZKu2XLPFHWrzNCbCJjiDLB4vxrUV3bXitLDm8Dy5PJp")
+    const programId = new anchor.web3.PublicKey("GpBYYXBYegV3QM7cfiG4Are9tpKQZiXseh4HvScJJDdJ")
 
     const program = new anchor.Program(IDL as any, programId, provider);
     setProgram(program);

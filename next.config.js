@@ -40,6 +40,7 @@ const plugins = [
   ],
 ];
 
+
 const nextConfig = {
   distDir: "build",
   swcMinify: true,

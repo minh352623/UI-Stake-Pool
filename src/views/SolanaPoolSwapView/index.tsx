@@ -121,7 +121,7 @@ const NetSwap: FC<any> = ({ }) => {
             }
         })
     }
-    const [fee, setFee] = useState<number>(1)
+    const [fee, setFee] = useState<number>(0.1)
 
     const initPoolSwapSolana = async (dataInit: IInitPoolSwap) => {
         console.log("🚀 ~ initPoolSwapSolana ~ dataInit:", dataInit)

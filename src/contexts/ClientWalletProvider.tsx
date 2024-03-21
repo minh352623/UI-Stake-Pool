@@ -31,7 +31,7 @@ export function ClientWalletProvider(
       // getLedgerWallet(),
       // getSolongWallet(),
       // getMathWallet(),
-      getSolletWallet(),
+      // getSolletWallet(),
     ],
     []
   );
