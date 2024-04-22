@@ -10,7 +10,7 @@ export const SelectAndConnectWalletButton: FC<Props> = ({
   onUseWalletClick,
 }) => {
   const { setVisible } = useWalletModal();
-  const { wallet, connect, connecting, publicKey } = useWallet();
+  const { wallet, connect, connecting, publicKey,disconnect } = useWallet();
 
   useEffect(() => {
     if (!publicKey && wallet) {

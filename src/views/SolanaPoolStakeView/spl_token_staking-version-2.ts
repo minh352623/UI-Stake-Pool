@@ -1,2321 +1,1549 @@
 export type SplTokenStaking = {
-  "version": "1.3.1",
-  "name": "spl_token_staking",
-  "instructions": [
+  version: "1.3.1";
+  name: "spl_token_staking";
+  instructions: [
     {
-      "name": "initializeStakePool",
-      "docs": [
-        "Create a [StakePool](state::StakePool) and initialize the Mint that will",
-        "represent effective stake weight."
-      ],
-      "accounts": [
+      name: "initializeStakePool";
+      accounts: [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "Payer of rent"
-          ]
+          name: "payer";
+          isMut: true;
+          isSigner: true;
+          docs: ["Payer of rent"];
         },
         {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "Authority that can add rewards pools"
-          ]
+          name: "authority";
+          isMut: false;
+          isSigner: false;
+          docs: ["Authority that can add rewards pools"];
         },
         {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
+          name: "mint";
+          isMut: false;
+          isSigner: false;
+          docs: [
             "SPL Token Mint of the underlying token to be deposited for staking"
-          ]
+          ];
         },
         {
-          "name": "stakePool",
-          "isMut": true,
-          "isSigner": false
+          name: "stakePool";
+          isMut: true;
+          isSigner: false;
         },
         {
-          "name": "stakeMint",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "An SPL token Mint for the effective stake weight token"
-          ]
+          name: "stakeMint";
+          isMut: true;
+          isSigner: false;
+          docs: ["An SPL token Mint for the effective stake weight token"];
         },
         {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "An SPL token Account for staging A tokens"
-          ]
+          name: "tokenProgram";
+          isMut: false;
+          isSigner: false;
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
+          name: "rent";
+          isMut: false;
+          isSigner: false;
         },
         {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
         },
         {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
+          name: "walletReceiveCommission";
+          isMut: false;
+          isSigner: false;
         }
-      ],
-      "args": [
+      ];
+      args: [
         {
-          "name": "nonce",
-          "type": "u8"
+          name: "nonce";
+          type: "u8";
         },
         {
-          "name": "maxWeight",
-          "type": "u64"
+          name: "blockTime";
+          type: "u64";
         },
         {
-          "name": "minDuration",
-          "type": "u64"
+          name: "tokenOnBlockTime";
+          type: "u64";
         },
         {
-          "name": "maxDuration",
-          "type": "u64"
+          name: "blockTimeWithdrawOrigin";
+          type: "u64";
         },
         {
-          "name": "blockTime",
-          "type": "u64"
+          name: "rangeWithdrawProfit";
+          type: "u64";
         },
         {
-          "name": "tokenOnBlockTime",
-          "type": "u64"
-        },
-        {
-          "name": "blockTimeWithdrawOrigin",
-          "type": "u64"
-        },
-        {
-          "name": "rangeWithdrawProfit",
-          "type": "u64"
+          name: "percentCommission";
+          type: "u64";
         }
-      ]
+      ];
     },
     {
-      "name": "transferAuthority",
-      "docs": [
-        "DANGEROUSLY Update `authority` of [StakePool](state::StakePool) to `new_authority`.",
-        "This is useful for quickly setting up a StakePool and then transfering it to a",
-        "form of governance."
-      ],
-      "accounts": [
+      name: "deposit";
+      accounts: [
         {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "Current authority of the StakePool"
-          ]
+          name: "payer";
+          isMut: true;
+          isSigner: true;
         },
         {
-          "name": "newAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "stakePool",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "StakePool that will have it's authority updated"
-          ]
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "addRewardPool",
-      "docs": [
-        "Add a [RewardPool](state::RewardPool) to an existing [StakePool](state::StakePool).",
-        "",
-        "Can only be invoked by the StakePool's authority."
-      ],
-      "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "Payer of rent"
-          ]
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true,
-          "docs": [
-            "Authority of the StakePool"
-          ]
-        },
-        {
-          "name": "rewardMint",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL Token Mint of the token that will be distributed as rewards"
-          ]
-        },
-        {
-          "name": "stakePool",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "StakePool where the RewardPool will be added"
-          ]
-        },
-        {
-          "name": "rewardVault",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "An SPL token Account for holding rewards to be claimed"
-          ]
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "index",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "deposit",
-      "docs": [
-        "Deposit (aka Stake) a wallet's tokens to the specified [StakePool](state::StakePool).",
-        "Depending on the `lockup_duration` and the StakePool's weighting configuration, the",
-        "wallet initiating the deposit will receive tokens representing their effective stake",
-        "(i.e. deposited amount multiplied by the lockup weight).",
-        "",
-        "For each RewardPool, the latest amount per effective stake will be recalculated to ensure",
-        "the latest accumulated rewards are attributed to all previous depositors and not the deposit",
-        "resulting from this instruction.",
-        "",
-        "A [StakeDepositReceipt](state::StakeDepositReceipt) will be created to track the",
-        "lockup duration, effective weight, and claimable rewards.",
-        "",
-        "Remaining accounts are required: pass the `reward_vault` of each reward pool. These must be",
-        "passed in the same order as `StakePool.reward_pools`"
-      ],
-      "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "owner",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
+          name: "owner";
+          isMut: false;
+          isSigner: false;
+          docs: [
             "Owner of the StakeDepositReceipt, which may differ",
             "from the account staking."
-          ]
+          ];
         },
         {
-          "name": "from",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
+          name: "from";
+          isMut: true;
+          isSigner: false;
+          docs: [
             "Token Account to transfer stake_mint from, to be deposited into the vault"
-          ]
+          ];
         },
         {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Vault of the StakePool token will be transfer to"
-          ]
+          name: "vault";
+          isMut: true;
+          isSigner: false;
+          docs: ["Vault of the StakePool token will be transfer to"];
         },
         {
-          "name": "stakeMint",
-          "isMut": true,
-          "isSigner": false
+          name: "stakeMint";
+          isMut: true;
+          isSigner: false;
         },
         {
-          "name": "destination",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token account the StakePool token will be transfered to"
-          ]
+          name: "destination";
+          isMut: true;
+          isSigner: false;
+          docs: ["Token account the StakePool token will be transfered to"];
         },
         {
-          "name": "stakePool",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "StakePool owning the vault that will receive the deposit"
-          ]
+          name: "stakePool";
+          isMut: true;
+          isSigner: false;
+          docs: ["StakePool owning the vault that will receive the deposit"];
         },
         {
-          "name": "stakeDepositReceipt",
-          "isMut": true,
-          "isSigner": false
+          name: "stakeDepositReceipt";
+          isMut: true;
+          isSigner: false;
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
+          name: "tokenProgram";
+          isMut: false;
+          isSigner: false;
         },
         {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
+          name: "rent";
+          isMut: false;
+          isSigner: false;
         },
         {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "globalState",
-          "isMut": false,
-          "isSigner": false
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
         }
-      ],
-      "args": [
+      ];
+      args: [
         {
-          "name": "nonce",
-          "type": "u32"
+          name: "nonce";
+          type: "u32";
         },
         {
-          "name": "amount",
-          "type": "u64"
+          name: "amount";
+          type: "u64";
         },
         {
-          "name": "lockupDuration",
-          "type": "u64"
+          name: "lockupDuration";
+          type: "u64";
         }
-      ]
+      ];
     },
     {
-      "name": "claimAll",
-      "docs": [
-        "Claim unclaimed rewards from all RewardPools for a specific StakeDepositReceipt.",
-        "",
-        "For each RewardPool, the latest amount per effective stake will be recalculated to ensure",
-        "the latest accumulated rewards are accounted for in the claimable amount. The StakeDepositReceipt",
-        "is also updated so that the latest claimed amount is equivalent, so that their claimable amount",
-        "is 0 after invoking the claim instruction."
-      ],
-      "accounts": [
+      name: "withdrawOrigin";
+      accounts: [
         {
-          "name": "claimBase",
-          "accounts": [
+          name: "claimBase";
+          accounts: [
             {
-              "name": "owner",
-              "isMut": true,
-              "isSigner": true,
-              "docs": [
-                "Owner of the StakeDepositReceipt"
-              ]
+              name: "owner";
+              isMut: true;
+              isSigner: true;
+              docs: ["Owner of the StakeDepositReceipt"];
             },
             {
-              "name": "stakePool",
-              "isMut": true,
-              "isSigner": false
+              name: "stakePool";
+              isMut: true;
+              isSigner: false;
             },
             {
-              "name": "stakeDepositReceipt",
-              "isMut": true,
-              "isSigner": false,
-              "docs": [
+              name: "stakeDepositReceipt";
+              isMut: true;
+              isSigner: false;
+              docs: [
                 "StakeDepositReceipt of the owner that will be used to claim respective rewards"
-              ]
+              ];
             },
             {
-              "name": "tokenProgram",
-              "isMut": false,
-              "isSigner": false
+              name: "tokenProgram";
+              isMut: false;
+              isSigner: false;
             }
-          ]
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "withdraw",
-      "docs": [
-        "Withdraw (aka Unstake) a wallet's tokens for a specific StakeDepositReceipt. The StakePool's",
-        "total weighted stake will be decreased by the effective stake amount of the StakeDepositReceipt",
-        "and the original amount deposited will be transferred out of the vault.",
-        "",
-        "All rewards will be claimed. So, for each RewardPool, the latest amount per effective stake will",
-        "be recalculated to ensure the latest accumulated rewards are accounted for in the claimable amount.",
-        "The StakeDepositReceipt is also updated so that the latest claimed amount is equivalent, so that",
-        "their claimable amount is 0 after invoking the withdraw instruction.",
-        "",
-        "StakeDepositReceipt account is closed after this instruction.",
-        "",
-        "Remaining accounts are required: pass the `reward_vault` of each reward pool. These must be",
-        "passed in the same order as `StakePool.reward_pools`. The owner (the token account which",
-        "gains the withdrawn funds) must also be passed be, in pairs like so:",
-        "* `<reward_vault[0]><owner[0]>`",
-        "* `<reward_vault[1]><owner[1]>",
-        "* ...etc"
-      ],
-      "accounts": [
-        {
-          "name": "claimBase",
-          "accounts": [
-            {
-              "name": "owner",
-              "isMut": true,
-              "isSigner": true,
-              "docs": [
-                "Owner of the StakeDepositReceipt"
-              ]
-            },
-            {
-              "name": "stakePool",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "stakeDepositReceipt",
-              "isMut": true,
-              "isSigner": false,
-              "docs": [
-                "StakeDepositReceipt of the owner that will be used to claim respective rewards"
-              ]
-            },
-            {
-              "name": "tokenProgram",
-              "isMut": false,
-              "isSigner": false
-            }
-          ]
+          ];
         },
         {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Vault of the StakePool token will be transferred from"
-          ]
+          name: "vault";
+          isMut: true;
+          isSigner: false;
+          docs: ["Vault of the StakePool token will be transferred from"];
         },
         {
-          "name": "stakeMint",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "stake_mint of StakePool that will be burned"
-          ]
+          name: "stakeMint";
+          isMut: true;
+          isSigner: false;
+          docs: ["stake_mint of StakePool that will be burned"];
         },
         {
-          "name": "from",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
+          name: "from";
+          isMut: true;
+          isSigner: false;
+          docs: [
             "Token Account holding weighted stake representation token to burn"
-          ]
+          ];
         },
         {
-          "name": "destination",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token account to transfer the previously staked token to"
-          ]
+          name: "destination";
+          isMut: true;
+          isSigner: false;
+          docs: ["Token account to transfer the previously staked token to"];
         },
         {
-          "name": "globalState",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "walletAdmin",
-          "isMut": true,
-          "isSigner": false
+          name: "walletAdminCommission";
+          isMut: true;
+          isSigner: false;
         }
-      ],
-      "args": []
+      ];
+      args: [];
     },
     {
-      "name": "withdrawProfits",
-      "accounts": [
+      name: "withdrawProfits";
+      accounts: [
         {
-          "name": "claimBase",
-          "accounts": [
+          name: "claimBase";
+          accounts: [
             {
-              "name": "owner",
-              "isMut": true,
-              "isSigner": true,
-              "docs": [
-                "Owner of the StakeDepositReceipt"
-              ]
+              name: "owner";
+              isMut: true;
+              isSigner: true;
+              docs: ["Owner of the StakeDepositReceipt"];
             },
             {
-              "name": "stakePool",
-              "isMut": true,
-              "isSigner": false
+              name: "stakePool";
+              isMut: true;
+              isSigner: false;
             },
             {
-              "name": "stakeDepositReceipt",
-              "isMut": true,
-              "isSigner": false,
-              "docs": [
+              name: "stakeDepositReceipt";
+              isMut: true;
+              isSigner: false;
+              docs: [
                 "StakeDepositReceipt of the owner that will be used to claim respective rewards"
-              ]
+              ];
             },
             {
-              "name": "tokenProgram",
-              "isMut": false,
-              "isSigner": false
+              name: "tokenProgram";
+              isMut: false;
+              isSigner: false;
             }
-          ]
+          ];
         },
         {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Vault of the StakePool token will be transferred from"
-          ]
+          name: "vault";
+          isMut: true;
+          isSigner: false;
+          docs: ["Vault of the StakePool token will be transferred from"];
         },
         {
-          "name": "stakeMint",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "stake_mint of StakePool that will be burned"
-          ]
+          name: "stakeMint";
+          isMut: true;
+          isSigner: false;
+          docs: ["stake_mint of StakePool that will be burned"];
         },
         {
-          "name": "from",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
+          name: "from";
+          isMut: true;
+          isSigner: false;
+          docs: [
             "Token Account holding weighted stake representation token to burn"
-          ]
+          ];
         },
         {
-          "name": "destination",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token account to transfer the previously staked token to"
-          ]
+          name: "destination";
+          isMut: true;
+          isSigner: false;
+          docs: ["Token account to transfer the previously staked token to"];
         },
         {
-          "name": "globalState",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "walletAdmin",
-          "isMut": true,
-          "isSigner": false
+          name: "walletAdminCommission";
+          isMut: true;
+          isSigner: false;
         }
-      ],
-      "args": []
+      ];
+      args: [];
     },
     {
-      "name": "transferToAdmin",
-      "accounts": [
+      name: "transferToAdmin";
+      accounts: [
         {
-          "name": "claimBase",
-          "accounts": [
-            {
-              "name": "owner",
-              "isMut": true,
-              "isSigner": true,
-              "docs": [
-                "Owner of the StakeDepositReceipt"
-              ]
-            },
-            {
-              "name": "stakePool",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "stakeDepositReceipt",
-              "isMut": true,
-              "isSigner": false,
-              "docs": [
-                "StakeDepositReceipt of the owner that will be used to claim respective rewards"
-              ]
-            },
-            {
-              "name": "tokenProgram",
-              "isMut": false,
-              "isSigner": false
-            }
-          ]
+          name: "authority";
+          isMut: false;
+          isSigner: true;
+          docs: ["Authority of the StakePool"];
         },
         {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true,
-          "docs": [
-            "Authority of the StakePool"
-          ]
+          name: "vault";
+          isMut: true;
+          isSigner: false;
+          docs: ["Vault of the StakePool token will be transferred from"];
         },
         {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Vault of the StakePool token will be transferred from"
-          ]
+          name: "stakePool";
+          isMut: true;
+          isSigner: false;
         },
         {
-          "name": "stakeMint",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "stake_mint of StakePool that will be burned"
-          ]
+          name: "destination";
+          isMut: true;
+          isSigner: false;
+          docs: ["Token account to transfer the previously staked token to"];
         },
         {
-          "name": "stakePool",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "from",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token Account holding weighted stake representation token to burn"
-          ]
-        },
-        {
-          "name": "destination",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token account to transfer the previously staked token to"
-          ]
+          name: "tokenProgram";
+          isMut: false;
+          isSigner: false;
         }
-      ],
-      "args": [
+      ];
+      args: [
         {
-          "name": "amount",
-          "type": "u64"
+          name: "amount";
+          type: "u64";
         }
-      ]
+      ];
     },
     {
-      "name": "transferTokens",
-      "accounts": [
+      name: "transferAuthority";
+      accounts: [
         {
-          "name": "sender",
-          "isMut": true,
-          "isSigner": true
+          name: "authority";
+          isMut: true;
+          isSigner: true;
+          docs: ["Current authority of the StakePool"];
         },
         {
-          "name": "recipient",
-          "isMut": false,
-          "isSigner": false
+          name: "newAuthority";
+          isMut: false;
+          isSigner: false;
         },
         {
-          "name": "mintAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "senderTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "recipientTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
+          name: "stakePool";
+          isMut: true;
+          isSigner: false;
+          docs: ["StakePool that will have it's authority updated"];
         }
-      ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
+      ];
+      args: [];
     },
     {
-      "name": "initGlobalState",
-      "accounts": [
+      name: "lockPool";
+      accounts: [
         {
-          "name": "globalState",
-          "isMut": true,
-          "isSigner": false
+          name: "authority";
+          isMut: true;
+          isSigner: true;
+          docs: ["Current authority of the StakePool"];
         },
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
+          name: "newAuthority";
+          isMut: false;
+          isSigner: false;
         },
         {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "stakePool",
-          "isMut": false,
-          "isSigner": false
+          name: "stakePool";
+          isMut: true;
+          isSigner: false;
+          docs: ["StakePool that will have it's authority updated"];
         }
-      ],
-      "args": []
+      ];
+      args: [
+        {
+          name: "status";
+          type: "u64";
+        }
+      ];
     },
     {
-      "name": "updateGlobalState",
-      "accounts": [
+      name: "setVault";
+      accounts: [
         {
-          "name": "globalState",
-          "isMut": true,
-          "isSigner": false
+          name: "payer";
+          isMut: true;
+          isSigner: true;
+          docs: ["Payer of rent"];
         },
         {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          name: "authority";
+          isMut: true;
+          isSigner: true;
+          docs: ["Current authority of the StakePool"];
         },
         {
-          "name": "stakePool",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": [
+          name: "stakePool";
+          isMut: true;
+          isSigner: false;
+          docs: ["StakePool that will have it's authority updated"];
+        },
         {
-          "name": "state",
-          "type": "bool"
+          name: "mint";
+          isMut: false;
+          isSigner: false;
+          docs: [
+            "SPL Token Mint of the underlying token to be deposited for staking"
+          ];
+        },
+        {
+          name: "vault";
+          isMut: true;
+          isSigner: false;
+          docs: ["An SPL token Account for staging A tokens"];
+        },
+        {
+          name: "rent";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "tokenProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
         }
-      ]
+      ];
+      args: [];
+    },
+    {
+      name: "updatePercentComission";
+      accounts: [
+        {
+          name: "authority";
+          isMut: true;
+          isSigner: true;
+          docs: ["Current authority of the StakePool"];
+        },
+        {
+          name: "stakePool";
+          isMut: true;
+          isSigner: false;
+          docs: ["StakePool that will have it's authority updated"];
+        }
+      ];
+      args: [
+        {
+          name: "percentCommission";
+          type: "f64";
+        }
+      ];
     }
-  ],
-  "accounts": [
+  ];
+  accounts: [
     {
-      "name": "globalState",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "stakePool";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "locked",
-            "type": "bool"
-          },
-          {
-            "name": "data",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "stakePool",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "creator",
-            "docs": [
+            name: "creator";
+            docs: [
               "The original creator of the StakePool. Necessary for signer seeds"
-            ],
-            "type": "publicKey"
+            ];
+            type: "publicKey";
           },
           {
-            "name": "authority",
-            "docs": [
-              "Pubkey that can make updates to StakePool"
-            ],
-            "type": "publicKey"
+            name: "authority";
+            docs: ["Pubkey that can make updates to StakePool"];
+            type: "publicKey";
           },
           {
-            "name": "totalWeightedStake",
-            "docs": [
+            name: "totalWeightedStake";
+            docs: [
               "Total amount staked that accounts for the lock up period weighting.\n    Note, this is not equal to the amount of SPL Tokens staked."
-            ],
-            "type": "u128"
+            ];
+            type: "u64";
           },
           {
-            "name": "vault",
-            "docs": [
-              "Token Account to store the staked SPL Token"
-            ],
-            "type": "publicKey"
+            name: "vault";
+            docs: ["Token Account to store the staked SPL Token"];
+            type: "publicKey";
           },
           {
-            "name": "mint",
-            "docs": [
-              "Mint of the token being staked"
-            ],
-            "type": "publicKey"
+            name: "mint";
+            docs: ["Mint of the token being staked"];
+            type: "publicKey";
           },
           {
-            "name": "stakeMint",
-            "docs": [
-              "Mint of the token representing effective stake"
-            ],
-            "type": "publicKey"
+            name: "stakeMint";
+            docs: ["Mint of the token representing effective stake"];
+            type: "publicKey";
           },
           {
-            "name": "rewardPools",
-            "docs": [
-              "Array of RewardPools that apply to the stake pool.",
-              "Unused entries are Pubkey default. In arbitrary order, and may have gaps."
-            ],
-            "type": {
-              "array": [
-                {
-                  "defined": "RewardPool"
-                },
-                10
-              ]
-            }
+            name: "nonce";
+            docs: ["Nonce to derive multiple stake pools from same mint"];
+            type: "u8";
           },
           {
-            "name": "baseWeight",
-            "docs": [
-              "The minimum weight received for staking. In terms of 1 / SCALE_FACTOR_BASE.",
-              "Examples:",
-              "* `min_weight = 1 x SCALE_FACTOR_BASE` = minmum of 1x multiplier for > min_duration staking",
-              "* `min_weight = 2 x SCALE_FACTOR_BASE` = minmum of 2x multiplier for > min_duration staking"
-            ],
-            "type": "u64"
+            name: "bumpSeed";
+            docs: ["Bump seed for stake_mint"];
+            type: "u8";
           },
           {
-            "name": "maxWeight",
-            "docs": [
-              "Maximum weight for staking lockup (i.e. weight multiplier when locked",
-              "up for max duration). In terms of 1 / SCALE_FACTOR_BASE. Examples:",
-              "* A `max_weight = 1 x SCALE_FACTOR_BASE` = 1x multiplier for max staking duration",
-              "* A `max_weight = 2 x SCALE_FACTOR_BASE` = 2x multiplier for max staking duration"
-            ],
-            "type": "u64"
+            name: "padding0";
+            type: {
+              array: ["u8", 6];
+            };
           },
           {
-            "name": "minDuration",
-            "docs": [
-              "Minimum duration for lockup. At this point, the staker would receive the base weight. In seconds."
-            ],
-            "type": "u64"
+            name: "reserved0";
+            type: {
+              array: ["u8", 256];
+            };
           },
           {
-            "name": "maxDuration",
-            "docs": [
-              "Maximum duration for lockup. At this point, the staker would receive the max weight. In seconds."
-            ],
-            "type": "u64"
+            name: "blockTime";
+            type: "u64";
           },
           {
-            "name": "nonce",
-            "docs": [
-              "Nonce to derive multiple stake pools from same mint"
-            ],
-            "type": "u8"
+            name: "percentTokenOnBlockTime";
+            type: "f64";
           },
           {
-            "name": "bumpSeed",
-            "docs": [
-              "Bump seed for stake_mint"
-            ],
-            "type": "u8"
+            name: "blockTimeWithdrawOrigin";
+            type: "u64";
           },
           {
-            "name": "padding0",
-            "type": {
-              "array": [
-                "u8",
-                6
-              ]
-            }
+            name: "rangeWithdrawProfit";
+            type: "i64";
           },
           {
-            "name": "reserved0",
-            "type": {
-              "array": [
-                "u8",
-                256
-              ]
-            }
+            name: "percentCommission";
+            type: "f64";
           },
           {
-            "name": "blockTime",
-            "type": "u64"
+            name: "walletReceiveCommission";
+            type: "publicKey";
           },
           {
-            "name": "tokenOnBlockTime",
-            "type": "u64"
-          },
-          {
-            "name": "blockTimeWithdrawOrigin",
-            "type": "u64"
-          },
-          {
-            "name": "rangeWithdrawProfit",
-            "type": "i64"
+            name: "globalState";
+            type: "u64";
           }
-        ]
-      }
+        ];
+      };
     },
     {
-      "name": "stakeDepositReceipt",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "stakeDepositReceipt";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "owner",
-            "docs": [
-              "Pubkey that owns the staked assets"
-            ],
-            "type": "publicKey"
+            name: "owner";
+            docs: ["Pubkey that owns the staked assets"];
+            type: "publicKey";
           },
           {
-            "name": "payer",
-            "docs": [
-              "Pubkey that paid for the deposit"
-            ],
-            "type": "publicKey"
+            name: "payer";
+            docs: ["Pubkey that paid for the deposit"];
+            type: "publicKey";
           },
           {
-            "name": "stakePool",
-            "docs": [
-              "StakePool the deposit is for"
-            ],
-            "type": "publicKey"
+            name: "stakePool";
+            docs: ["StakePool the deposit is for"];
+            type: "publicKey";
           },
           {
-            "name": "lockupDuration",
-            "docs": [
-              "Duration of the lockup period in seconds"
-            ],
-            "type": "u64"
+            name: "lockupDuration";
+            docs: ["Duration of the lockup period in seconds"];
+            type: "u64";
           },
           {
-            "name": "depositTimestamp",
-            "docs": [
-              "Timestamp in seconds of when the stake lockup began"
-            ],
-            "type": "i64"
+            name: "depositTimestamp";
+            docs: ["Timestamp in seconds of when the stake lockup began"];
+            type: "i64";
           },
           {
-            "name": "depositAmount",
-            "docs": [
-              "Amount of SPL token deposited"
-            ],
-            "type": "u64"
+            name: "depositAmount";
+            docs: ["Amount of SPL token deposited"];
+            type: "u64";
           },
           {
-            "name": "effectiveStake",
-            "docs": [
-              "Amount of stake weighted by lockup duration."
-            ],
-            "type": "u128"
+            name: "effectiveStake";
+            docs: ["Amount of stake weighted by lockup duration."];
+            type: "u64";
           },
           {
-            "name": "claimedAmounts",
-            "docs": [
-              "The amount per reward that has been claimed or perceived to be claimed. Indexes align with",
-              "the StakedPool reward_pools property."
-            ],
-            "type": {
-              "array": [
-                "u128",
-                10
-              ]
-            }
+            name: "lastTimeUpdate";
+            type: "i64";
           },
           {
-            "name": "lastTimeUpdate",
-            "type": "i64"
+            name: "percentCurrent";
+            type: "f64";
           },
           {
-            "name": "percentCurrent",
-            "type": "f64"
+            name: "amountClaimed";
+            type: "u64";
           },
           {
-            "name": "amountClaimed",
-            "type": "u64"
+            name: "nonAmountClaimed";
+            type: "u64";
           },
           {
-            "name": "timeRanges",
-            "type": {
-              "vec": {
-                "defined": "TimeRange"
-              }
-            }
+            name: "amountClaimedAdmin";
+            type: "u64";
           }
-        ]
-      }
+        ];
+      };
     }
-  ],
-  "types": [
+  ];
+  errors: [
     {
-      "name": "RewardPool",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "rewardVault",
-            "docs": [
-              "Token Account to store the reward SPL Token"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "rewardsPerEffectiveStake",
-            "docs": [
-              "Ever increasing accumulator of the amount of rewards per effective stake.\n    Said another way, if a user deposited before any rewards were added to the\n    `vault`, then this would be the token amount per effective stake they could\n    claim."
-            ],
-            "type": "u128"
-          },
-          {
-            "name": "lastAmount",
-            "docs": [
-              "latest amount of tokens in the vault"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "padding0",
-            "type": {
-              "array": [
-                "u8",
-                8
-              ]
-            }
-          }
-        ]
-      }
+      code: 6000;
+      name: "InvalidAuthority";
+      msg: "Invalid StakePool authority";
     },
     {
-      "name": "TimeRange",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "from",
-            "type": "i64"
-          },
-          {
-            "name": "to",
-            "type": "i64"
-          },
-          {
-            "name": "percent",
-            "type": "f64"
-          },
-          {
-            "name": "timeWithdraw",
-            "type": "i64"
-          },
-          {
-            "name": "isWithdraw",
-            "type": "bool"
-          }
-        ]
-      }
+      code: 6001;
+      name: "RewardPoolIndexOccupied";
+      msg: "RewardPool index is already occupied";
+    },
+    {
+      code: 6002;
+      name: "InvalidStakePoolVault";
+      msg: "StakePool vault is invalid";
+    },
+    {
+      code: 6003;
+      name: "InvalidStakePoolAdminCommission";
+      msg: "Stake admin commission is invalid";
+    },
+    {
+      code: 6004;
+      name: "InvalidRewardPoolVault";
+      msg: "RewardPool vault is invalid";
+    },
+    {
+      code: 6005;
+      name: "InvalidRewardPoolVaultIndex";
+      msg: "Invalid RewardPool vault remaining account index";
+    },
+    {
+      code: 6006;
+      name: "InvalidOwner";
+      msg: "Invalid StakeDepositReceiptOwner";
+    },
+    {
+      code: 6007;
+      name: "InvalidStakePool";
+      msg: "Invalid StakePool";
+    },
+    {
+      code: 6008;
+      name: "PrecisionMath";
+      msg: "Math precision error";
+    },
+    {
+      code: 6009;
+      name: "InvalidStakeMint";
+      msg: "Invalid stake mint";
+    },
+    {
+      code: 6010;
+      name: "StakeStillLocked";
+      msg: "Stake is still locked";
+    },
+    {
+      code: 6011;
+      name: "InvalidStakePoolDuration";
+      msg: "Max duration must be great than min";
+    },
+    {
+      code: 6012;
+      name: "InvalidStakePoolWeight";
+      msg: "Max weight must be great than min";
+    },
+    {
+      code: 6013;
+      name: "DurationTooShort";
+      msg: "Duration too short";
+    },
+    {
+      code: 6014;
+      name: "Unauthorized";
+      msg: "The caller is not authorized to perform this action.";
+    },
+    {
+      code: 6015;
+      name: "ResourceLocked";
+      msg: "The resource is currently locked.";
+    },
+    {
+      code: 6016;
+      name: "TimeCalculationError";
+      msg: "The resource is TimeCalculationError.";
+    },
+    {
+      code: 6017;
+      name: "CalculationOverflow";
+      msg: "The resource is CalculationOverflow.";
+    },
+    {
+      code: 6018;
+      name: "BlockTimeWithdrawOrigin";
+      msg: "Block Time Withraw Origin.";
+    },
+    {
+      code: 6019;
+      name: "WalletAdminError";
+      msg: "Wallet Address Is Not Authorize.";
+    },
+    {
+      code: 6020;
+      name: "InvalidOwnerSign";
+      msg: "The given owner is not part of this multisig.";
+    },
+    {
+      code: 6021;
+      name: "InvalidOwnersLen";
+      msg: "Owners length must be non zero.";
+    },
+    {
+      code: 6022;
+      name: "NotEnoughSigners";
+      msg: "Not enough owners signed this transaction.";
+    },
+    {
+      code: 6023;
+      name: "TransactionAlreadySigned";
+      msg: "Cannot delete a transaction that has been signed by an owner.";
+    },
+    {
+      code: 6024;
+      name: "Overflow";
+      msg: "Overflow when adding.";
+    },
+    {
+      code: 6025;
+      name: "UnableToDelete";
+      msg: "Cannot delete a transaction the owner did not create.";
+    },
+    {
+      code: 6026;
+      name: "AlreadyExecuted";
+      msg: "The given transaction has already been executed.";
+    },
+    {
+      code: 6027;
+      name: "InvalidThreshold";
+      msg: "Threshold must be less than or equal to the number of owners.";
+    },
+    {
+      code: 6028;
+      name: "UniqueOwners";
+      msg: "Owners must be unique";
     }
-  ],
-  "errors": [
-    {
-      "code": 6000,
-      "name": "InvalidAuthority",
-      "msg": "Invalid StakePool authority"
-    },
-    {
-      "code": 6001,
-      "name": "RewardPoolIndexOccupied",
-      "msg": "RewardPool index is already occupied"
-    },
-    {
-      "code": 6002,
-      "name": "InvalidStakePoolVault",
-      "msg": "StakePool vault is invalid"
-    },
-    {
-      "code": 6003,
-      "name": "InvalidRewardPoolVault",
-      "msg": "RewardPool vault is invalid"
-    },
-    {
-      "code": 6004,
-      "name": "InvalidRewardPoolVaultIndex",
-      "msg": "Invalid RewardPool vault remaining account index"
-    },
-    {
-      "code": 6005,
-      "name": "InvalidOwner",
-      "msg": "Invalid StakeDepositReceiptOwner"
-    },
-    {
-      "code": 6006,
-      "name": "InvalidStakePool",
-      "msg": "Invalid StakePool"
-    },
-    {
-      "code": 6007,
-      "name": "PrecisionMath",
-      "msg": "Math precision error"
-    },
-    {
-      "code": 6008,
-      "name": "InvalidStakeMint",
-      "msg": "Invalid stake mint"
-    },
-    {
-      "code": 6009,
-      "name": "StakeStillLocked",
-      "msg": "Stake is still locked"
-    },
-    {
-      "code": 6010,
-      "name": "InvalidStakePoolDuration",
-      "msg": "Max duration must be great than min"
-    },
-    {
-      "code": 6011,
-      "name": "InvalidStakePoolWeight",
-      "msg": "Max weight must be great than min"
-    },
-    {
-      "code": 6012,
-      "name": "DurationTooShort",
-      "msg": "Duration too short"
-    },
-    {
-      "code": 6013,
-      "name": "Unauthorized",
-      "msg": "The caller is not authorized to perform this action."
-    },
-    {
-      "code": 6014,
-      "name": "ResourceLocked",
-      "msg": "The resource is currently locked."
-    },
-    {
-      "code": 6015,
-      "name": "TimeCalculationError",
-      "msg": "The resource is TimeCalculationError."
-    },
-    {
-      "code": 6016,
-      "name": "CalculationOverflow",
-      "msg": "The resource is CalculationOverflow."
-    },
-    {
-      "code": 6017,
-      "name": "BlockTimeWithdrawOrigin",
-      "msg": "Block Time Withraw Origin."
-    },
-    {
-      "code": 6018,
-      "name": "WalletAdminError",
-      "msg": "Wallet Address Is Not Authorize."
-    },
-    {
-      "code": 6019,
-      "name": "NoAvailableSlot",
-      "msg": "No available slot for a new time range"
-    }
-  ]
+  ];
 };
 
 export const IDL: SplTokenStaking = {
-  "version": "1.3.1",
-  "name": "spl_token_staking",
-  "instructions": [
+  version: "1.3.1",
+  name: "spl_token_staking",
+  instructions: [
     {
-      "name": "initializeStakePool",
-      "docs": [
-        "Create a [StakePool](state::StakePool) and initialize the Mint that will",
-        "represent effective stake weight."
+      name: "initializeStakePool",
+      accounts: [
+        {
+          name: "payer",
+          isMut: true,
+          isSigner: true,
+          docs: ["Payer of rent"],
+        },
+        {
+          name: "authority",
+          isMut: false,
+          isSigner: false,
+          docs: ["Authority that can add rewards pools"],
+        },
+        {
+          name: "mint",
+          isMut: false,
+          isSigner: false,
+          docs: [
+            "SPL Token Mint of the underlying token to be deposited for staking",
+          ],
+        },
+        {
+          name: "stakePool",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "stakeMint",
+          isMut: true,
+          isSigner: false,
+          docs: ["An SPL token Mint for the effective stake weight token"],
+        },
+        {
+          name: "tokenProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "rent",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "walletReceiveCommission",
+          isMut: false,
+          isSigner: false,
+        },
       ],
-      "accounts": [
+      args: [
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "Payer of rent"
-          ]
+          name: "nonce",
+          type: "u8",
         },
         {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "Authority that can add rewards pools"
-          ]
+          name: "blockTime",
+          type: "u64",
         },
         {
-          "name": "mint",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL Token Mint of the underlying token to be deposited for staking"
-          ]
+          name: "tokenOnBlockTime",
+          type: "u64",
         },
         {
-          "name": "stakePool",
-          "isMut": true,
-          "isSigner": false
+          name: "blockTimeWithdrawOrigin",
+          type: "u64",
         },
         {
-          "name": "stakeMint",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "An SPL token Mint for the effective stake weight token"
-          ]
+          name: "rangeWithdrawProfit",
+          type: "u64",
         },
         {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "An SPL token Account for staging A tokens"
-          ]
+          name: "percentCommission",
+          type: "u64",
         },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
       ],
-      "args": [
-        {
-          "name": "nonce",
-          "type": "u8"
-        },
-        {
-          "name": "maxWeight",
-          "type": "u64"
-        },
-        {
-          "name": "minDuration",
-          "type": "u64"
-        },
-        {
-          "name": "maxDuration",
-          "type": "u64"
-        },
-        {
-          "name": "blockTime",
-          "type": "u64"
-        },
-        {
-          "name": "tokenOnBlockTime",
-          "type": "u64"
-        },
-        {
-          "name": "blockTimeWithdrawOrigin",
-          "type": "u64"
-        },
-        {
-          "name": "rangeWithdrawProfit",
-          "type": "u64"
-        }
-      ]
     },
     {
-      "name": "transferAuthority",
-      "docs": [
-        "DANGEROUSLY Update `authority` of [StakePool](state::StakePool) to `new_authority`.",
-        "This is useful for quickly setting up a StakePool and then transfering it to a",
-        "form of governance."
-      ],
-      "accounts": [
+      name: "deposit",
+      accounts: [
         {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "Current authority of the StakePool"
-          ]
+          name: "payer",
+          isMut: true,
+          isSigner: true,
         },
         {
-          "name": "newAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "stakePool",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "StakePool that will have it's authority updated"
-          ]
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "addRewardPool",
-      "docs": [
-        "Add a [RewardPool](state::RewardPool) to an existing [StakePool](state::StakePool).",
-        "",
-        "Can only be invoked by the StakePool's authority."
-      ],
-      "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true,
-          "docs": [
-            "Payer of rent"
-          ]
-        },
-        {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true,
-          "docs": [
-            "Authority of the StakePool"
-          ]
-        },
-        {
-          "name": "rewardMint",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "SPL Token Mint of the token that will be distributed as rewards"
-          ]
-        },
-        {
-          "name": "stakePool",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "StakePool where the RewardPool will be added"
-          ]
-        },
-        {
-          "name": "rewardVault",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "An SPL token Account for holding rewards to be claimed"
-          ]
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "index",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "deposit",
-      "docs": [
-        "Deposit (aka Stake) a wallet's tokens to the specified [StakePool](state::StakePool).",
-        "Depending on the `lockup_duration` and the StakePool's weighting configuration, the",
-        "wallet initiating the deposit will receive tokens representing their effective stake",
-        "(i.e. deposited amount multiplied by the lockup weight).",
-        "",
-        "For each RewardPool, the latest amount per effective stake will be recalculated to ensure",
-        "the latest accumulated rewards are attributed to all previous depositors and not the deposit",
-        "resulting from this instruction.",
-        "",
-        "A [StakeDepositReceipt](state::StakeDepositReceipt) will be created to track the",
-        "lockup duration, effective weight, and claimable rewards.",
-        "",
-        "Remaining accounts are required: pass the `reward_vault` of each reward pool. These must be",
-        "passed in the same order as `StakePool.reward_pools`"
-      ],
-      "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "owner",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
+          name: "owner",
+          isMut: false,
+          isSigner: false,
+          docs: [
             "Owner of the StakeDepositReceipt, which may differ",
-            "from the account staking."
-          ]
+            "from the account staking.",
+          ],
         },
         {
-          "name": "from",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token Account to transfer stake_mint from, to be deposited into the vault"
-          ]
+          name: "from",
+          isMut: true,
+          isSigner: false,
+          docs: [
+            "Token Account to transfer stake_mint from, to be deposited into the vault",
+          ],
         },
         {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Vault of the StakePool token will be transfer to"
-          ]
+          name: "vault",
+          isMut: true,
+          isSigner: false,
+          docs: ["Vault of the StakePool token will be transfer to"],
         },
         {
-          "name": "stakeMint",
-          "isMut": true,
-          "isSigner": false
+          name: "stakeMint",
+          isMut: true,
+          isSigner: false,
         },
         {
-          "name": "destination",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token account the StakePool token will be transfered to"
-          ]
+          name: "destination",
+          isMut: true,
+          isSigner: false,
+          docs: ["Token account the StakePool token will be transfered to"],
         },
         {
-          "name": "stakePool",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "StakePool owning the vault that will receive the deposit"
-          ]
+          name: "stakePool",
+          isMut: true,
+          isSigner: false,
+          docs: ["StakePool owning the vault that will receive the deposit"],
         },
         {
-          "name": "stakeDepositReceipt",
-          "isMut": true,
-          "isSigner": false
+          name: "stakeDepositReceipt",
+          isMut: true,
+          isSigner: false,
         },
         {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
+          name: "tokenProgram",
+          isMut: false,
+          isSigner: false,
         },
         {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
+          name: "rent",
+          isMut: false,
+          isSigner: false,
         },
         {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
         },
-        {
-          "name": "globalState",
-          "isMut": false,
-          "isSigner": false
-        }
       ],
-      "args": [
+      args: [
         {
-          "name": "nonce",
-          "type": "u32"
+          name: "nonce",
+          type: "u32",
         },
         {
-          "name": "amount",
-          "type": "u64"
+          name: "amount",
+          type: "u64",
         },
         {
-          "name": "lockupDuration",
-          "type": "u64"
-        }
-      ]
+          name: "lockupDuration",
+          type: "u64",
+        },
+      ],
     },
     {
-      "name": "claimAll",
-      "docs": [
-        "Claim unclaimed rewards from all RewardPools for a specific StakeDepositReceipt.",
-        "",
-        "For each RewardPool, the latest amount per effective stake will be recalculated to ensure",
-        "the latest accumulated rewards are accounted for in the claimable amount. The StakeDepositReceipt",
-        "is also updated so that the latest claimed amount is equivalent, so that their claimable amount",
-        "is 0 after invoking the claim instruction."
-      ],
-      "accounts": [
+      name: "withdrawOrigin",
+      accounts: [
         {
-          "name": "claimBase",
-          "accounts": [
+          name: "claimBase",
+          accounts: [
             {
-              "name": "owner",
-              "isMut": true,
-              "isSigner": true,
-              "docs": [
-                "Owner of the StakeDepositReceipt"
-              ]
+              name: "owner",
+              isMut: true,
+              isSigner: true,
+              docs: ["Owner of the StakeDepositReceipt"],
             },
             {
-              "name": "stakePool",
-              "isMut": true,
-              "isSigner": false
+              name: "stakePool",
+              isMut: true,
+              isSigner: false,
             },
             {
-              "name": "stakeDepositReceipt",
-              "isMut": true,
-              "isSigner": false,
-              "docs": [
-                "StakeDepositReceipt of the owner that will be used to claim respective rewards"
-              ]
+              name: "stakeDepositReceipt",
+              isMut: true,
+              isSigner: false,
+              docs: [
+                "StakeDepositReceipt of the owner that will be used to claim respective rewards",
+              ],
             },
             {
-              "name": "tokenProgram",
-              "isMut": false,
-              "isSigner": false
-            }
-          ]
-        }
+              name: "tokenProgram",
+              isMut: false,
+              isSigner: false,
+            },
+          ],
+        },
+        {
+          name: "vault",
+          isMut: true,
+          isSigner: false,
+          docs: ["Vault of the StakePool token will be transferred from"],
+        },
+        {
+          name: "stakeMint",
+          isMut: true,
+          isSigner: false,
+          docs: ["stake_mint of StakePool that will be burned"],
+        },
+        {
+          name: "from",
+          isMut: true,
+          isSigner: false,
+          docs: [
+            "Token Account holding weighted stake representation token to burn",
+          ],
+        },
+        {
+          name: "destination",
+          isMut: true,
+          isSigner: false,
+          docs: ["Token account to transfer the previously staked token to"],
+        },
+        {
+          name: "walletAdminCommission",
+          isMut: true,
+          isSigner: false,
+        },
       ],
-      "args": []
+      args: [],
     },
     {
-      "name": "withdraw",
-      "docs": [
-        "Withdraw (aka Unstake) a wallet's tokens for a specific StakeDepositReceipt. The StakePool's",
-        "total weighted stake will be decreased by the effective stake amount of the StakeDepositReceipt",
-        "and the original amount deposited will be transferred out of the vault.",
-        "",
-        "All rewards will be claimed. So, for each RewardPool, the latest amount per effective stake will",
-        "be recalculated to ensure the latest accumulated rewards are accounted for in the claimable amount.",
-        "The StakeDepositReceipt is also updated so that the latest claimed amount is equivalent, so that",
-        "their claimable amount is 0 after invoking the withdraw instruction.",
-        "",
-        "StakeDepositReceipt account is closed after this instruction.",
-        "",
-        "Remaining accounts are required: pass the `reward_vault` of each reward pool. These must be",
-        "passed in the same order as `StakePool.reward_pools`. The owner (the token account which",
-        "gains the withdrawn funds) must also be passed be, in pairs like so:",
-        "* `<reward_vault[0]><owner[0]>`",
-        "* `<reward_vault[1]><owner[1]>",
-        "* ...etc"
+      name: "withdrawProfits",
+      accounts: [
+        {
+          name: "claimBase",
+          accounts: [
+            {
+              name: "owner",
+              isMut: true,
+              isSigner: true,
+              docs: ["Owner of the StakeDepositReceipt"],
+            },
+            {
+              name: "stakePool",
+              isMut: true,
+              isSigner: false,
+            },
+            {
+              name: "stakeDepositReceipt",
+              isMut: true,
+              isSigner: false,
+              docs: [
+                "StakeDepositReceipt of the owner that will be used to claim respective rewards",
+              ],
+            },
+            {
+              name: "tokenProgram",
+              isMut: false,
+              isSigner: false,
+            },
+          ],
+        },
+        {
+          name: "vault",
+          isMut: true,
+          isSigner: false,
+          docs: ["Vault of the StakePool token will be transferred from"],
+        },
+        {
+          name: "stakeMint",
+          isMut: true,
+          isSigner: false,
+          docs: ["stake_mint of StakePool that will be burned"],
+        },
+        {
+          name: "from",
+          isMut: true,
+          isSigner: false,
+          docs: [
+            "Token Account holding weighted stake representation token to burn",
+          ],
+        },
+        {
+          name: "destination",
+          isMut: true,
+          isSigner: false,
+          docs: ["Token account to transfer the previously staked token to"],
+        },
+        {
+          name: "walletAdminCommission",
+          isMut: true,
+          isSigner: false,
+        },
       ],
-      "accounts": [
-        {
-          "name": "claimBase",
-          "accounts": [
-            {
-              "name": "owner",
-              "isMut": true,
-              "isSigner": true,
-              "docs": [
-                "Owner of the StakeDepositReceipt"
-              ]
-            },
-            {
-              "name": "stakePool",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "stakeDepositReceipt",
-              "isMut": true,
-              "isSigner": false,
-              "docs": [
-                "StakeDepositReceipt of the owner that will be used to claim respective rewards"
-              ]
-            },
-            {
-              "name": "tokenProgram",
-              "isMut": false,
-              "isSigner": false
-            }
-          ]
-        },
-        {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Vault of the StakePool token will be transferred from"
-          ]
-        },
-        {
-          "name": "stakeMint",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "stake_mint of StakePool that will be burned"
-          ]
-        },
-        {
-          "name": "from",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token Account holding weighted stake representation token to burn"
-          ]
-        },
-        {
-          "name": "destination",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token account to transfer the previously staked token to"
-          ]
-        },
-        {
-          "name": "globalState",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "walletAdmin",
-          "isMut": true,
-          "isSigner": false
-        }
-      ],
-      "args": []
+      args: [],
     },
     {
-      "name": "withdrawProfits",
-      "accounts": [
+      name: "transferToAdmin",
+      accounts: [
         {
-          "name": "claimBase",
-          "accounts": [
-            {
-              "name": "owner",
-              "isMut": true,
-              "isSigner": true,
-              "docs": [
-                "Owner of the StakeDepositReceipt"
-              ]
-            },
-            {
-              "name": "stakePool",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "stakeDepositReceipt",
-              "isMut": true,
-              "isSigner": false,
-              "docs": [
-                "StakeDepositReceipt of the owner that will be used to claim respective rewards"
-              ]
-            },
-            {
-              "name": "tokenProgram",
-              "isMut": false,
-              "isSigner": false
-            }
-          ]
+          name: "authority",
+          isMut: false,
+          isSigner: true,
+          docs: ["Authority of the StakePool"],
         },
         {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Vault of the StakePool token will be transferred from"
-          ]
+          name: "vault",
+          isMut: true,
+          isSigner: false,
+          docs: ["Vault of the StakePool token will be transferred from"],
         },
         {
-          "name": "stakeMint",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "stake_mint of StakePool that will be burned"
-          ]
+          name: "stakePool",
+          isMut: true,
+          isSigner: false,
         },
         {
-          "name": "from",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token Account holding weighted stake representation token to burn"
-          ]
+          name: "destination",
+          isMut: true,
+          isSigner: false,
+          docs: ["Token account to transfer the previously staked token to"],
         },
         {
-          "name": "destination",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token account to transfer the previously staked token to"
-          ]
+          name: "tokenProgram",
+          isMut: false,
+          isSigner: false,
         },
-        {
-          "name": "globalState",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "walletAdmin",
-          "isMut": true,
-          "isSigner": false
-        }
       ],
-      "args": []
+      args: [
+        {
+          name: "amount",
+          type: "u64",
+        },
+      ],
     },
     {
-      "name": "transferToAdmin",
-      "accounts": [
+      name: "transferAuthority",
+      accounts: [
         {
-          "name": "claimBase",
-          "accounts": [
-            {
-              "name": "owner",
-              "isMut": true,
-              "isSigner": true,
-              "docs": [
-                "Owner of the StakeDepositReceipt"
-              ]
-            },
-            {
-              "name": "stakePool",
-              "isMut": true,
-              "isSigner": false
-            },
-            {
-              "name": "stakeDepositReceipt",
-              "isMut": true,
-              "isSigner": false,
-              "docs": [
-                "StakeDepositReceipt of the owner that will be used to claim respective rewards"
-              ]
-            },
-            {
-              "name": "tokenProgram",
-              "isMut": false,
-              "isSigner": false
-            }
-          ]
+          name: "authority",
+          isMut: true,
+          isSigner: true,
+          docs: ["Current authority of the StakePool"],
         },
         {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true,
-          "docs": [
-            "Authority of the StakePool"
-          ]
+          name: "newAuthority",
+          isMut: false,
+          isSigner: false,
         },
         {
-          "name": "vault",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Vault of the StakePool token will be transferred from"
-          ]
+          name: "stakePool",
+          isMut: true,
+          isSigner: false,
+          docs: ["StakePool that will have it's authority updated"],
         },
-        {
-          "name": "stakeMint",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "stake_mint of StakePool that will be burned"
-          ]
-        },
-        {
-          "name": "stakePool",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "from",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token Account holding weighted stake representation token to burn"
-          ]
-        },
-        {
-          "name": "destination",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Token account to transfer the previously staked token to"
-          ]
-        }
       ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
+      args: [],
     },
     {
-      "name": "transferTokens",
-      "accounts": [
+      name: "lockPool",
+      accounts: [
         {
-          "name": "sender",
-          "isMut": true,
-          "isSigner": true
+          name: "authority",
+          isMut: true,
+          isSigner: true,
+          docs: ["Current authority of the StakePool"],
         },
         {
-          "name": "recipient",
-          "isMut": false,
-          "isSigner": false
+          name: "newAuthority",
+          isMut: false,
+          isSigner: false,
         },
         {
-          "name": "mintAccount",
-          "isMut": true,
-          "isSigner": false
+          name: "stakePool",
+          isMut: true,
+          isSigner: false,
+          docs: ["StakePool that will have it's authority updated"],
         },
-        {
-          "name": "senderTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "recipientTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "associatedTokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
       ],
-      "args": [
+      args: [
         {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
+          name: "status",
+          type: "u64",
+        },
+      ],
     },
     {
-      "name": "initGlobalState",
-      "accounts": [
+      name: "setVault",
+      accounts: [
         {
-          "name": "globalState",
-          "isMut": true,
-          "isSigner": false
+          name: "payer",
+          isMut: true,
+          isSigner: true,
+          docs: ["Payer of rent"],
         },
         {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
+          name: "authority",
+          isMut: true,
+          isSigner: true,
+          docs: ["Current authority of the StakePool"],
         },
         {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
+          name: "stakePool",
+          isMut: true,
+          isSigner: false,
+          docs: ["StakePool that will have it's authority updated"],
         },
         {
-          "name": "stakePool",
-          "isMut": false,
-          "isSigner": false
-        }
+          name: "mint",
+          isMut: false,
+          isSigner: false,
+          docs: [
+            "SPL Token Mint of the underlying token to be deposited for staking",
+          ],
+        },
+        {
+          name: "vault",
+          isMut: true,
+          isSigner: false,
+          docs: ["An SPL token Account for staging A tokens"],
+        },
+        {
+          name: "rent",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "tokenProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
       ],
-      "args": []
+      args: [],
     },
     {
-      "name": "updateGlobalState",
-      "accounts": [
+      name: "updatePercentComission",
+      accounts: [
         {
-          "name": "globalState",
-          "isMut": true,
-          "isSigner": false
+          name: "authority",
+          isMut: true,
+          isSigner: true,
+          docs: ["Current authority of the StakePool"],
         },
         {
-          "name": "authority",
-          "isMut": false,
-          "isSigner": true
+          name: "stakePool",
+          isMut: true,
+          isSigner: false,
+          docs: ["StakePool that will have it's authority updated"],
         },
-        {
-          "name": "stakePool",
-          "isMut": true,
-          "isSigner": false
-        }
       ],
-      "args": [
+      args: [
         {
-          "name": "state",
-          "type": "bool"
-        }
-      ]
-    }
+          name: "percentCommission",
+          type: "f64",
+        },
+      ],
+    },
   ],
-  "accounts": [
+  accounts: [
     {
-      "name": "globalState",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "stakePool",
+      type: {
+        kind: "struct",
+        fields: [
           {
-            "name": "locked",
-            "type": "bool"
+            name: "creator",
+            docs: [
+              "The original creator of the StakePool. Necessary for signer seeds",
+            ],
+            type: "publicKey",
           },
           {
-            "name": "data",
-            "type": "u64"
-          }
-        ]
-      }
+            name: "authority",
+            docs: ["Pubkey that can make updates to StakePool"],
+            type: "publicKey",
+          },
+          {
+            name: "totalWeightedStake",
+            docs: [
+              "Total amount staked that accounts for the lock up period weighting.\n    Note, this is not equal to the amount of SPL Tokens staked.",
+            ],
+            type: "u64",
+          },
+          {
+            name: "vault",
+            docs: ["Token Account to store the staked SPL Token"],
+            type: "publicKey",
+          },
+          {
+            name: "mint",
+            docs: ["Mint of the token being staked"],
+            type: "publicKey",
+          },
+          {
+            name: "stakeMint",
+            docs: ["Mint of the token representing effective stake"],
+            type: "publicKey",
+          },
+          {
+            name: "nonce",
+            docs: ["Nonce to derive multiple stake pools from same mint"],
+            type: "u8",
+          },
+          {
+            name: "bumpSeed",
+            docs: ["Bump seed for stake_mint"],
+            type: "u8",
+          },
+          {
+            name: "padding0",
+            type: {
+              array: ["u8", 6],
+            },
+          },
+          {
+            name: "reserved0",
+            type: {
+              array: ["u8", 256],
+            },
+          },
+          {
+            name: "blockTime",
+            type: "u64",
+          },
+          {
+            name: "percentTokenOnBlockTime",
+            type: "f64",
+          },
+          {
+            name: "blockTimeWithdrawOrigin",
+            type: "u64",
+          },
+          {
+            name: "rangeWithdrawProfit",
+            type: "i64",
+          },
+          {
+            name: "percentCommission",
+            type: "f64",
+          },
+          {
+            name: "walletReceiveCommission",
+            type: "publicKey",
+          },
+          {
+            name: "globalState",
+            type: "u64",
+          },
+        ],
+      },
     },
     {
-      "name": "stakePool",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "stakeDepositReceipt",
+      type: {
+        kind: "struct",
+        fields: [
           {
-            "name": "creator",
-            "docs": [
-              "The original creator of the StakePool. Necessary for signer seeds"
-            ],
-            "type": "publicKey"
+            name: "owner",
+            docs: ["Pubkey that owns the staked assets"],
+            type: "publicKey",
           },
           {
-            "name": "authority",
-            "docs": [
-              "Pubkey that can make updates to StakePool"
-            ],
-            "type": "publicKey"
+            name: "payer",
+            docs: ["Pubkey that paid for the deposit"],
+            type: "publicKey",
           },
           {
-            "name": "totalWeightedStake",
-            "docs": [
-              "Total amount staked that accounts for the lock up period weighting.\n    Note, this is not equal to the amount of SPL Tokens staked."
-            ],
-            "type": "u128"
+            name: "stakePool",
+            docs: ["StakePool the deposit is for"],
+            type: "publicKey",
           },
           {
-            "name": "vault",
-            "docs": [
-              "Token Account to store the staked SPL Token"
-            ],
-            "type": "publicKey"
+            name: "lockupDuration",
+            docs: ["Duration of the lockup period in seconds"],
+            type: "u64",
           },
           {
-            "name": "mint",
-            "docs": [
-              "Mint of the token being staked"
-            ],
-            "type": "publicKey"
+            name: "depositTimestamp",
+            docs: ["Timestamp in seconds of when the stake lockup began"],
+            type: "i64",
           },
           {
-            "name": "stakeMint",
-            "docs": [
-              "Mint of the token representing effective stake"
-            ],
-            "type": "publicKey"
+            name: "depositAmount",
+            docs: ["Amount of SPL token deposited"],
+            type: "u64",
           },
           {
-            "name": "rewardPools",
-            "docs": [
-              "Array of RewardPools that apply to the stake pool.",
-              "Unused entries are Pubkey default. In arbitrary order, and may have gaps."
-            ],
-            "type": {
-              "array": [
-                {
-                  "defined": "RewardPool"
-                },
-                10
-              ]
-            }
+            name: "effectiveStake",
+            docs: ["Amount of stake weighted by lockup duration."],
+            type: "u64",
           },
           {
-            "name": "baseWeight",
-            "docs": [
-              "The minimum weight received for staking. In terms of 1 / SCALE_FACTOR_BASE.",
-              "Examples:",
-              "* `min_weight = 1 x SCALE_FACTOR_BASE` = minmum of 1x multiplier for > min_duration staking",
-              "* `min_weight = 2 x SCALE_FACTOR_BASE` = minmum of 2x multiplier for > min_duration staking"
-            ],
-            "type": "u64"
+            name: "lastTimeUpdate",
+            type: "i64",
           },
           {
-            "name": "maxWeight",
-            "docs": [
-              "Maximum weight for staking lockup (i.e. weight multiplier when locked",
-              "up for max duration). In terms of 1 / SCALE_FACTOR_BASE. Examples:",
-              "* A `max_weight = 1 x SCALE_FACTOR_BASE` = 1x multiplier for max staking duration",
-              "* A `max_weight = 2 x SCALE_FACTOR_BASE` = 2x multiplier for max staking duration"
-            ],
-            "type": "u64"
+            name: "percentCurrent",
+            type: "f64",
           },
           {
-            "name": "minDuration",
-            "docs": [
-              "Minimum duration for lockup. At this point, the staker would receive the base weight. In seconds."
-            ],
-            "type": "u64"
+            name: "amountClaimed",
+            type: "u64",
           },
           {
-            "name": "maxDuration",
-            "docs": [
-              "Maximum duration for lockup. At this point, the staker would receive the max weight. In seconds."
-            ],
-            "type": "u64"
+            name: "nonAmountClaimed",
+            type: "u64",
           },
           {
-            "name": "nonce",
-            "docs": [
-              "Nonce to derive multiple stake pools from same mint"
-            ],
-            "type": "u8"
+            name: "amountClaimedAdmin",
+            type: "u64",
           },
-          {
-            "name": "bumpSeed",
-            "docs": [
-              "Bump seed for stake_mint"
-            ],
-            "type": "u8"
-          },
-          {
-            "name": "padding0",
-            "type": {
-              "array": [
-                "u8",
-                6
-              ]
-            }
-          },
-          {
-            "name": "reserved0",
-            "type": {
-              "array": [
-                "u8",
-                256
-              ]
-            }
-          },
-          {
-            "name": "blockTime",
-            "type": "u64"
-          },
-          {
-            "name": "tokenOnBlockTime",
-            "type": "u64"
-          },
-          {
-            "name": "blockTimeWithdrawOrigin",
-            "type": "u64"
-          },
-          {
-            "name": "rangeWithdrawProfit",
-            "type": "i64"
-          }
-        ]
-      }
+        ],
+      },
     },
-    {
-      "name": "stakeDepositReceipt",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "owner",
-            "docs": [
-              "Pubkey that owns the staked assets"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "payer",
-            "docs": [
-              "Pubkey that paid for the deposit"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "stakePool",
-            "docs": [
-              "StakePool the deposit is for"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "lockupDuration",
-            "docs": [
-              "Duration of the lockup period in seconds"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "depositTimestamp",
-            "docs": [
-              "Timestamp in seconds of when the stake lockup began"
-            ],
-            "type": "i64"
-          },
-          {
-            "name": "depositAmount",
-            "docs": [
-              "Amount of SPL token deposited"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "effectiveStake",
-            "docs": [
-              "Amount of stake weighted by lockup duration."
-            ],
-            "type": "u128"
-          },
-          {
-            "name": "claimedAmounts",
-            "docs": [
-              "The amount per reward that has been claimed or perceived to be claimed. Indexes align with",
-              "the StakedPool reward_pools property."
-            ],
-            "type": {
-              "array": [
-                "u128",
-                10
-              ]
-            }
-          },
-          {
-            "name": "lastTimeUpdate",
-            "type": "i64"
-          },
-          {
-            "name": "percentCurrent",
-            "type": "f64"
-          },
-          {
-            "name": "amountClaimed",
-            "type": "u64"
-          },
-          {
-            "name": "timeRanges",
-            "type": {
-              "vec": {
-                "defined": "TimeRange"
-              }
-            }
-          }
-        ]
-      }
-    }
   ],
-  "types": [
+  errors: [
     {
-      "name": "RewardPool",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "rewardVault",
-            "docs": [
-              "Token Account to store the reward SPL Token"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "rewardsPerEffectiveStake",
-            "docs": [
-              "Ever increasing accumulator of the amount of rewards per effective stake.\n    Said another way, if a user deposited before any rewards were added to the\n    `vault`, then this would be the token amount per effective stake they could\n    claim."
-            ],
-            "type": "u128"
-          },
-          {
-            "name": "lastAmount",
-            "docs": [
-              "latest amount of tokens in the vault"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "padding0",
-            "type": {
-              "array": [
-                "u8",
-                8
-              ]
-            }
-          }
-        ]
-      }
+      code: 6000,
+      name: "InvalidAuthority",
+      msg: "Invalid StakePool authority",
     },
     {
-      "name": "TimeRange",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "from",
-            "type": "i64"
-          },
-          {
-            "name": "to",
-            "type": "i64"
-          },
-          {
-            "name": "percent",
-            "type": "f64"
-          },
-          {
-            "name": "timeWithdraw",
-            "type": "i64"
-          },
-          {
-            "name": "isWithdraw",
-            "type": "bool"
-          }
-        ]
-      }
-    }
+      code: 6001,
+      name: "RewardPoolIndexOccupied",
+      msg: "RewardPool index is already occupied",
+    },
+    {
+      code: 6002,
+      name: "InvalidStakePoolVault",
+      msg: "StakePool vault is invalid",
+    },
+    {
+      code: 6003,
+      name: "InvalidStakePoolAdminCommission",
+      msg: "Stake admin commission is invalid",
+    },
+    {
+      code: 6004,
+      name: "InvalidRewardPoolVault",
+      msg: "RewardPool vault is invalid",
+    },
+    {
+      code: 6005,
+      name: "InvalidRewardPoolVaultIndex",
+      msg: "Invalid RewardPool vault remaining account index",
+    },
+    {
+      code: 6006,
+      name: "InvalidOwner",
+      msg: "Invalid StakeDepositReceiptOwner",
+    },
+    {
+      code: 6007,
+      name: "InvalidStakePool",
+      msg: "Invalid StakePool",
+    },
+    {
+      code: 6008,
+      name: "PrecisionMath",
+      msg: "Math precision error",
+    },
+    {
+      code: 6009,
+      name: "InvalidStakeMint",
+      msg: "Invalid stake mint",
+    },
+    {
+      code: 6010,
+      name: "StakeStillLocked",
+      msg: "Stake is still locked",
+    },
+    {
+      code: 6011,
+      name: "InvalidStakePoolDuration",
+      msg: "Max duration must be great than min",
+    },
+    {
+      code: 6012,
+      name: "InvalidStakePoolWeight",
+      msg: "Max weight must be great than min",
+    },
+    {
+      code: 6013,
+      name: "DurationTooShort",
+      msg: "Duration too short",
+    },
+    {
+      code: 6014,
+      name: "Unauthorized",
+      msg: "The caller is not authorized to perform this action.",
+    },
+    {
+      code: 6015,
+      name: "ResourceLocked",
+      msg: "The resource is currently locked.",
+    },
+    {
+      code: 6016,
+      name: "TimeCalculationError",
+      msg: "The resource is TimeCalculationError.",
+    },
+    {
+      code: 6017,
+      name: "CalculationOverflow",
+      msg: "The resource is CalculationOverflow.",
+    },
+    {
+      code: 6018,
+      name: "BlockTimeWithdrawOrigin",
+      msg: "Block Time Withraw Origin.",
+    },
+    {
+      code: 6019,
+      name: "WalletAdminError",
+      msg: "Wallet Address Is Not Authorize.",
+    },
+    {
+      code: 6020,
+      name: "InvalidOwnerSign",
+      msg: "The given owner is not part of this multisig.",
+    },
+    {
+      code: 6021,
+      name: "InvalidOwnersLen",
+      msg: "Owners length must be non zero.",
+    },
+    {
+      code: 6022,
+      name: "NotEnoughSigners",
+      msg: "Not enough owners signed this transaction.",
+    },
+    {
+      code: 6023,
+      name: "TransactionAlreadySigned",
+      msg: "Cannot delete a transaction that has been signed by an owner.",
+    },
+    {
+      code: 6024,
+      name: "Overflow",
+      msg: "Overflow when adding.",
+    },
+    {
+      code: 6025,
+      name: "UnableToDelete",
+      msg: "Cannot delete a transaction the owner did not create.",
+    },
+    {
+      code: 6026,
+      name: "AlreadyExecuted",
+      msg: "The given transaction has already been executed.",
+    },
+    {
+      code: 6027,
+      name: "InvalidThreshold",
+      msg: "Threshold must be less than or equal to the number of owners.",
+    },
+    {
+      code: 6028,
+      name: "UniqueOwners",
+      msg: "Owners must be unique",
+    },
   ],
-  "errors": [
-    {
-      "code": 6000,
-      "name": "InvalidAuthority",
-      "msg": "Invalid StakePool authority"
-    },
-    {
-      "code": 6001,
-      "name": "RewardPoolIndexOccupied",
-      "msg": "RewardPool index is already occupied"
-    },
-    {
-      "code": 6002,
-      "name": "InvalidStakePoolVault",
-      "msg": "StakePool vault is invalid"
-    },
-    {
-      "code": 6003,
-      "name": "InvalidRewardPoolVault",
-      "msg": "RewardPool vault is invalid"
-    },
-    {
-      "code": 6004,
-      "name": "InvalidRewardPoolVaultIndex",
-      "msg": "Invalid RewardPool vault remaining account index"
-    },
-    {
-      "code": 6005,
-      "name": "InvalidOwner",
-      "msg": "Invalid StakeDepositReceiptOwner"
-    },
-    {
-      "code": 6006,
-      "name": "InvalidStakePool",
-      "msg": "Invalid StakePool"
-    },
-    {
-      "code": 6007,
-      "name": "PrecisionMath",
-      "msg": "Math precision error"
-    },
-    {
-      "code": 6008,
-      "name": "InvalidStakeMint",
-      "msg": "Invalid stake mint"
-    },
-    {
-      "code": 6009,
-      "name": "StakeStillLocked",
-      "msg": "Stake is still locked"
-    },
-    {
-      "code": 6010,
-      "name": "InvalidStakePoolDuration",
-      "msg": "Max duration must be great than min"
-    },
-    {
-      "code": 6011,
-      "name": "InvalidStakePoolWeight",
-      "msg": "Max weight must be great than min"
-    },
-    {
-      "code": 6012,
-      "name": "DurationTooShort",
-      "msg": "Duration too short"
-    },
-    {
-      "code": 6013,
-      "name": "Unauthorized",
-      "msg": "The caller is not authorized to perform this action."
-    },
-    {
-      "code": 6014,
-      "name": "ResourceLocked",
-      "msg": "The resource is currently locked."
-    },
-    {
-      "code": 6015,
-      "name": "TimeCalculationError",
-      "msg": "The resource is TimeCalculationError."
-    },
-    {
-      "code": 6016,
-      "name": "CalculationOverflow",
-      "msg": "The resource is CalculationOverflow."
-    },
-    {
-      "code": 6017,
-      "name": "BlockTimeWithdrawOrigin",
-      "msg": "Block Time Withraw Origin."
-    },
-    {
-      "code": 6018,
-      "name": "WalletAdminError",
-      "msg": "Wallet Address Is Not Authorize."
-    },
-    {
-      "code": 6019,
-      "name": "NoAvailableSlot",
-      "msg": "No available slot for a new time range"
-    }
-  ]
 };

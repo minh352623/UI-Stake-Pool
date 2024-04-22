@@ -45,6 +45,8 @@ class MyDocument extends Document {
         <body>
           <Main />
           <NextScript />
+          <div id="integrated-terminal"></div>
+          <script src='https://terminal.jup.ag/main-v2.js' />
         </body>
       </Html>
     );
